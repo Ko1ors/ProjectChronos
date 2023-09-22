@@ -2,10 +2,13 @@ import express from "express";
 import "express-async-errors";
 import ViteExpress from "vite-express";
 import apiRouter from "./routes/api";
+import nftRouter from "./routes/nft";
 
 const app = express();
 
 app.use('/api', apiRouter);
+app.use('/api/nft', nftRouter);
+
 
 // error handler
 app.use((err: any, req: any, res: any, next: any) => {
