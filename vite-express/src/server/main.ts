@@ -8,14 +8,8 @@ const app = express();
 app.use('/api', apiRouter);
 
 // error handler
-app.use(function(err: any, req: any, res: any) {
-  res.status(err.status || 500);
-  // if you using view enggine
-  res.render('error', {
-      message: err.message,
-      error: {}
-  });
-  // or you can use res.send();        
+app.use((err: any, req: any, res: any, next: any) => {
+  res.status(500).json({error: err.message})      
 });
 
 
