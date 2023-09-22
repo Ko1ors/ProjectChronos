@@ -1,9 +1,9 @@
 import express from "express";
+import "express-async-errors";
 import ViteExpress from "vite-express";
 import apiRouter from "./routes/api";
 
 const app = express();
-
 
 app.use('/api', apiRouter);
 
@@ -17,10 +17,6 @@ app.use(function(err: any, req: any, res: any) {
   });
   // or you can use res.send();        
 });
-
-// process.on('uncaughtException', function (err) {
-//   console.error(err);
-// });
 
 
 app.get("/hello", (_, res) => {
