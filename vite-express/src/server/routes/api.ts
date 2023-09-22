@@ -1,7 +1,13 @@
 import express from 'express';
 import getContractAsync from '../shared/getContractAsync';
+import 'dotenv/config'
 
 const router = express.Router();
+
+// TODO: not secure. Only for demo purposes
+router.get('/getEnv', async function(req, res, next) {
+  res.send(process.env);
+});
 
 router.get('/getMetadata', async function(req, res, next) {
   const contract = await getContractAsync();
