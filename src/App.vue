@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
+import FormMetanask from './components/FormMetamask.vue'
 
 
 </script>
@@ -33,32 +33,12 @@ import Button from 'primevue/button';
     <div class="section-title">
       <h1 class="title">Welcome to chronos!</h1>
     </div>
-    <div class="col-lg-4 meta-form mx-auto">
-      <h4 class="wallet-text">
-        Connect with your wallet to access your profile
-      </h4>
-      <Button class="button-metamask">
-        <img class="fox" src="./resources/MetaMask_Fox.svg.png" alt="Metamask">
-        <span>Login via metamask</span>
-      </Button>
-    </div>
+    <FormMetanask></FormMetanask>
     <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
   </div>
 </template>
 
 <style scoped>
-.meta-form {
-  border: 2px solid;
-  height: 300px;
-  display: flex;
-  margin-top: 50px;
-  border-radius: 5px;
-  background-color: var(--surface-section);
-  flex-direction: column;
-  padding: 20px;
-  align-items: center;
-}
-
 .navbar-brand {
   margin-left: 10px;
   margin-bottom: 3px;
@@ -75,25 +55,6 @@ import Button from 'primevue/button';
 
 .p-button {
   border-radius: 6px;
-}
-
-.button-metamask {
-  width: 50%;
-  height: 20%;
-  margin-top: 80px;
-}
-
-.button-metamask span {
-  font-size: large;
-  font-weight: bold;
-  display: block;
-  text-align: center;
-  width: 100%;
-}
-
-.fox {
-  width: 30px;
-  height: 30px;
 }
 
 .section-title {
