@@ -24,7 +24,7 @@ export const loginAsync = async function (
   return response
 }
 
-export const logoutAsync = async function (): Promise<Response<string>> {
+export const logoutAsync = async function (): Promise<Response<boolean>> {
   const response = postAsync<boolean>(`${apiUrl}/Users/Logout`, {})
   return response
 }
@@ -104,7 +104,7 @@ export const getAsync = async function <T>(url: string, options?: RequestInit) {
     console.error(errorResponse)
     return errorResponse
   }
-  return { success: true, message: '', data: await getContentAsync(response) }
+  return { success: true, message: '', data: (await getContentAsync(response)) as T }
 }
 
 export const postAsync = async function <T>(
@@ -131,7 +131,7 @@ export const postAsync = async function <T>(
     console.error(errorResponse)
     return errorResponse
   }
-  return { success: true, message: '', data: await getContentAsync(response) }
+  return { success: true, message: '', data: (await getContentAsync(response)) as T }
 }
 
 export const putAsync = async function <T>(url: string, body: any, options?: RequestInit) {
@@ -153,7 +153,7 @@ export const putAsync = async function <T>(url: string, body: any, options?: Req
     console.error(errorResponse)
     return errorResponse
   }
-  return { success: true, message: '', data: await getContentAsync(response) }
+  return { success: true, message: '', data: (await getContentAsync(response)) as T }
 }
 
 export const deleteAsync = async function <T>(url: string, body: any, options?: RequestInit) {
@@ -175,5 +175,5 @@ export const deleteAsync = async function <T>(url: string, body: any, options?: 
     console.error(errorResponse)
     return errorResponse
   }
-  return { success: true, message: '', data: await getContentAsync(response) }
+  return { success: true, message: '', data: (await getContentAsync(response)) as T }
 }
