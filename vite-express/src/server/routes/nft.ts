@@ -26,15 +26,15 @@ const validateRarity = (rarityType: any): rarityType is Rarity => {
 }
 
 interface NFTMetadata {
-  name: string;
-  description: string;
-  image: string;
-  element: Element;
-  class: CardClass;
-  power: number;
-  health: number;
-  agility: number;
-  rarity: Rarity;
+    name: string;
+    description: string;
+    image: string;
+    element: Element;
+    class: CardClass;
+    power: number;
+    health: number;
+    agility: number;
+    rarity: Rarity;
 }
 
 const router = express.Router();
@@ -57,25 +57,25 @@ router.get('/count', async (req, res) => {
 router.post('/mint', async (req: Request<NFTMetadata>, res) => {
     const metadata = req.body as NFTMetadata;
 
-    if(!metadata) 
+    if (!metadata)
         return res.status(400).send('Metadata is required');
-    if(!metadata.name)
+    if (!metadata.name)
         return res.status(400).send('Name is required');
-    if(!metadata.description)
+    if (!metadata.description)
         return res.status(400).send('Description is required');
-    if(!metadata.image)
+    if (!metadata.image)
         return res.status(400).send('Image is required');
-    if(!validateElement(metadata.element))
+    if (!validateElement(metadata.element))
         return res.status(400).send('Element is required');
-    if(!validateClass(metadata.class))
+    if (!validateClass(metadata.class))
         return res.status(400).send('Class is required');
-    if(!metadata.power)
+    if (!metadata.power)
         return res.status(400).send('Power is required');
-    if(!metadata.health)
+    if (!metadata.health)
         return res.status(400).send('Health is required');
-    if(!metadata.agility)
+    if (!metadata.agility)
         return res.status(400).send('Agility is required');
-    if(!validateRarity(metadata.rarity))
+    if (!validateRarity(metadata.rarity))
         return res.status(400).send('Rarity is required');
 
     // Custom metadata of the NFTs to create
@@ -104,14 +104,14 @@ router.post('/transfer', async (req, res) => {
     // The address of the wallet you want to send the NFT to 
     // How many copies of the NFTs to transfer
     let { tokenId, address, amount } = req.body;
-    if(!tokenId && tokenId !== 0)
+    if (!tokenId && tokenId !== 0)
         return res.status(400).send('Token ID is required');
-    if(!address)
+    if (!address)
         return res.status(400).send('To address is required');
-    if(!amount && amount !== 0)
+    if (!amount && amount !== 0)
         amount = 1;
 
-        
+
     // Use private sdk to sign the transaction
     const sdk = getPrivateSdk();
     const contract = await getContractAsync(sdk);
@@ -119,6 +119,36 @@ router.post('/transfer', async (req, res) => {
     res.send(result);
 });
 
+// Claim an NFT
+router.post('/claim', async (req, res) => {
+    // The token ID of the NFT you want to claim
+    // How many copies of the NFTs to claim
+    let { tokenId, amount } = req.body;
+    if (!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if (!amount && amount !== 0)
+        amount = 1;
+
+    // Use private sdk to sign the transaction
+    const sdk = getPrivateSdk();
+    const contract = await getContractAsync(sdk);
+    const result = await contract.erc1155.claim(tokenId, amount);
+    res.send(result);
+});
+
+// Set claiming conditions
+router.post('/setClaimingConditions', async (req, res) => {
+    const { tokenId, claimConditions } = req.body;
+    if (!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if (!claimConditions)
+        return res.status(400).send('Claim conditions are required');
+    // Use private sdk to sign the transaction
+    const sdk = getPrivateSdk();
+    const contract = await getContractAsync(sdk);
+    const result = await contract.erc1155.claimConditions.set(tokenId, claimConditions);
+    res.send(result);
+});
 
 
 export default router;
