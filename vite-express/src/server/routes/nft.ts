@@ -98,6 +98,27 @@ router.post('/mint', async (req: Request<NFTMetadata>, res) => {
     res.send(results);
 });
 
+// Transfer an NFT
+router.post('/transfer', async (req, res) => {
+    // The token ID of the NFT you want to send
+    // The address of the wallet you want to send the NFT to 
+    // How many copies of the NFTs to transfer
+    let { tokenId, address, amount } = req.body;
+    if(!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if(!address)
+        return res.status(400).send('To address is required');
+    if(!amount && amount !== 0)
+        amount = 1;
+
+        
+    // Use private sdk to sign the transaction
+    const sdk = getPrivateSdk();
+    const contract = await getContractAsync(sdk);
+    const result = await contract.erc1155.transfer(address, tokenId, amount);
+    res.send(result);
+});
+
 
 
 export default router;
