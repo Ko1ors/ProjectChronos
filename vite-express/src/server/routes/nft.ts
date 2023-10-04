@@ -145,6 +145,26 @@ router.post('/claim', async (req, res) => {
     res.send(result);
 });
 
+// Claim an NFT to a specific address
+router.post('/claimTo', async (req, res) => {
+    // The token ID of the NFT you want to claim
+    // The address of the wallet you want to send the NFT to 
+    // How many copies of the NFTs to claim
+    let { tokenId, address, amount } = req.body;
+    if (!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if (!address)
+        return res.status(400).send('To address is required');
+    if (!amount && amount !== 0)
+        amount = 1;
+
+    // Use private sdk to sign the transaction
+    const sdk = getPrivateSdk();
+    const contract = await getContractAsync(sdk);
+    const result = await contract.erc1155.claimTo(address, tokenId, amount);
+    res.send(result);
+});
+
 // Set claiming conditions
 router.post('/setClaimingConditions', async (req, res) => {
     const { tokenId, claimConditions } = req.body;
