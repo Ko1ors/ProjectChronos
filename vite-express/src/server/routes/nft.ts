@@ -46,6 +46,15 @@ router.get('/', async (req, res) => {
     res.send(nfts);
 });
 
+// Get Owned by address NFTs
+router.get('/owned/:address', async (req, res) => {
+    // Address of the wallet to get the NFTs of
+
+    const contract = await getContractAsync();
+    const nfts = await contract.erc1155.getOwned(req.params.address);
+    res.send(nfts);
+});
+
 // Get NFTs count
 router.get('/count', async (req, res) => {
     const contract = await getContractAsync();
