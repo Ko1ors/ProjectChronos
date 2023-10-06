@@ -107,4 +107,21 @@ router.post('/setApproval', async (req, res) => {
     res.send(result);
 });
 
+
+// Open a pack
+router.post('/open', async (req, res) => {
+    // The token ID of the pack you want to open
+    // How many packs to open
+    let { tokenId, amount } = req.body;
+    if (!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if (!amount && amount !== 0)
+        amount = 1;
+
+    const sdk = getPrivateSdk();
+    const contract = await getPacksContractAsync(sdk);
+    const result = await contract.open(tokenId, amount);
+    res.send(result);
+});
+
 export default router;
