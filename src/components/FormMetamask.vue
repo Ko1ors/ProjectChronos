@@ -5,7 +5,7 @@ import MetaMaskOnboarding from '@metamask/onboarding'
 //import { MetaMaskSDK } from '@metamask/sdk';
 import { ref } from 'vue';
 import { Buffer } from 'buffer';
-import { isAuthorizedAsync } from '../api/api';
+import { getAuthMessagesAsync, loginAsync } from '../api/api';
 import type { Response } from '../api/api';
 
 // const options = {
@@ -22,6 +22,8 @@ const networkVersion = ref(0);
 const accounts = ref<string[]>([]);
 const sign = ref<string>("");
 const message = ref<string>("test message");
+let messageResponse: Response<string>;
+let responseInfo: string;
 
 const mumbaiId = 80001;
 
@@ -69,11 +71,19 @@ const signMessageAsync = async () => {
   const provider = await detectEthereumProvider();
   // For historical reasons, you must submit the message to sign in hex-encoded UTF-8.
   // This uses a Node.js-style buffer shim in the browser.
-  const msg = `0x${Buffer.from(message.value, 'utf8').toString('hex')}`;
-  sign.value = await (provider as any).request({
-    method: 'personal_sign',
-    params: [msg, accounts.value[0]],
-  });
+  messageResponse = await getAuthMessagesAsync(accounts.value[0]);
+  if (messageResponse.data) {
+    message.value = messageResponse.data;
+    const msg = `0x${Buffer.from(message.value, 'utf8').toString('hex')}`;
+    sign.value = await (provider as any).request({
+      method: 'personal_sign',
+      params: [msg, accounts.value[0]],
+    });
+    await loginAsync(accounts.value[0], sign.value, true);
+  }
+  else {
+    responseInfo = messageResponse.message;
+  }
 }
 
 
@@ -92,6 +102,7 @@ const signMessageAsync = async () => {
       <span>Login via metamask</span>
     </Button>
     <p v-if="isMetamaskConnected && networkVersion != mumbaiId">Please switch to Polygon Mumbai Testnet</p>
+    <p v-if="responseInfo">Error in response: {{ responseInfo }}</p>
   </div>
 </template>
 

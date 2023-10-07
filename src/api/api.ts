@@ -17,10 +17,11 @@ export const isUserAdminAsync = async function (): Promise<Response<boolean>> {
 }
 
 export const loginAsync = async function (
-  username: string,
-  password: string
+  address: string,
+  signature: string,
+  rememberMe: boolean
 ): Promise<Response<string>> {
-  const response = postAsync<string>(`${apiUrl}/Users/Login`, { username, password })
+  const response = postAsync<string>(`${apiUrl}/Users/Login`, { address, signature, rememberMe })
   return response
 }
 
@@ -48,6 +49,11 @@ export const uploadImageAsync = async function (
 
 export const getContactMessagesAsync = async function (): Promise<Response<string[]>> {
   const response = getAsync<string[]>(`${apiUrl}/Contact`)
+  return response
+}
+
+export const getAuthMessagesAsync = async function (address: string): Promise<Response<string>> {
+  const response = getAsync<string>(`${apiUrl}/Users/GetAuthMessage?address=${address}`)
   return response
 }
 
