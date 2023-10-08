@@ -3,6 +3,7 @@ import "express-async-errors";
 import ViteExpress from "vite-express";
 import apiRouter from "./routes/api";
 import nftRouter from "./routes/nft";
+import packsRouter from "./routes/packs";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
@@ -47,6 +48,8 @@ app.use(express.json());
 
 app.use('/api', apiRouter);
 app.use('/api/nft', nftRouter);
+app.use('/api/packs', packsRouter);
+
 
 
 // error handler
