@@ -1,11 +1,11 @@
 using ProjectChronos.DB;
 using ProjectChronos.Entities;
-using ProjectChronos.Interfaces.Services;
 using ProjectChronos.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting;
 using System.Net;
+using ProjectChronos.Common.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

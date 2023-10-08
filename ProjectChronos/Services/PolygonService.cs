@@ -1,7 +1,7 @@
-﻿using ProjectChronos.Interfaces.Services;
-using ProjectChronos.Models.Responses;
+﻿using ProjectChronos.Models.Responses;
 using Newtonsoft.Json;
 using System.Text;
+using ProjectChronos.Common.Interfaces.Services;
 
 namespace ProjectChronos.Services
 {

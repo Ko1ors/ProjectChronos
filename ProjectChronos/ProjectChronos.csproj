@@ -16,4 +16,8 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting" Version="4.3.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ProjectChronos.Common\ProjectChronos.Common.csproj" />
+	</ItemGroup>
 </Project>

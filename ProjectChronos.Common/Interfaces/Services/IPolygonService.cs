@@ -1,4 +1,4 @@
-﻿namespace ProjectChronos.Interfaces.Services
+﻿namespace ProjectChronos.Common.Interfaces.Services
 {
     public interface IPolygonService
     {
