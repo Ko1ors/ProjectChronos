@@ -10,8 +10,15 @@ const router = express.Router();
 // Get all Packs
 router.get('/', async (req, res) => {
     const contract = await getPacksContractAsync();
-    const nfts = await contract.getAll();
-    res.send(nfts);
+    const packs = await contract.getAll();
+    res.send(packs);
+});
+
+// Get Owned by address Packs
+router.get('/owned/:address', async (req, res) => {
+    const contract = await getPacksContractAsync();
+    const packs = await contract.getOwned(req.params.address);
+    res.send(packs);
 });
 
 interface PackReward {
