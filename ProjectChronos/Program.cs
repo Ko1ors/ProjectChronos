@@ -20,7 +20,10 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IExpressApiService, ExpressApiService>();
 builder.Services.AddScoped<IPolygonService, PolygonService>();
+builder.Services.AddScoped<ICardPackService, CardPackService>();
+
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -90,6 +93,10 @@ using (var scope = app.Services.CreateScope())
     {
         await roleManager.CreateAsync(new IdentityRole("Administrator"));
     }
+
+    // Ensure welcome pack template exists
+    var packService = scope.ServiceProvider.GetService<ICardPackService>();
+    packService.EnsureWelcomePackTemplateExists();
 }
 
 
