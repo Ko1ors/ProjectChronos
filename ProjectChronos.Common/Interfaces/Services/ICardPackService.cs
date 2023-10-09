@@ -12,5 +12,7 @@ namespace ProjectChronos.Common.Interfaces.Services
         int CreatePacks(CardPackType type);
 
         int CreatePacks(ICardPackTemplate packTemplate);
+
+        int GetPacksRemaining(CardPackType type);
     }
 }

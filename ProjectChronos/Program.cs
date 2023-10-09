@@ -24,6 +24,7 @@ builder.Services.AddScoped<IExpressApiService, ExpressApiService>();
 builder.Services.AddScoped<IPolygonService, PolygonService>();
 builder.Services.AddScoped<ICardPackService, CardPackService>();
 
+builder.Services.AddHostedService<PackCreationHostedService>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

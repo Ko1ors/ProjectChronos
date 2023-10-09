@@ -148,5 +148,13 @@ namespace ProjectChronos.Services
 
             return false;
         }
+
+        public int GetPacksRemaining(CardPackType type)
+        {
+           return _dbContext.CreatedPacks
+                .Where(cp => cp.CardPackTemplate.Type == type)
+                .Select(cp => cp.QuantityRemaining)
+                .Sum();
+        }
     }
 }
