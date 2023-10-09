@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProjectChronos.Common.Models.ExpressApi;
 
 namespace ProjectChronos.Common.Interfaces.Services
 {
     public interface IExpressApiService
     {
+        Task<ExpressResponse<T>> SendRequestAsync<T>(string url, string method, object body = null);
 
+        Task<ExpressResponse<Metadata>> GetOwnedNftsAsync(string address);
     }
 }
