@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Common.Models.ExpressApi;
+using System.Net;
 using System.Text;
 
 namespace ProjectChronos.Services
@@ -82,6 +83,8 @@ namespace ProjectChronos.Services
                     {
                         currentRetries++;
                     }
+                    // Add some delay to avoid spamming the API
+                    Thread.Sleep(500 * currentRetries);
                 }
 
                 return new ExpressResponse<T>
@@ -102,10 +105,70 @@ namespace ProjectChronos.Services
         }
 
 
+        public async Task<bool> SendRequestAsync(string url, string method, object body = null, bool retry = true)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(new HttpMethod(method), url);
+
+                if (body != null)
+                {
+                    request.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+                }
+
+                var maxRetries = retry ? Retries : 1;
+                var currentRetries = 0;
+                var lastResponseContent = string.Empty;
+
+                while (currentRetries < maxRetries)
+                {
+                    try
+                    {
+                        var response = await HttpClient.SendAsync(request);
+                        lastResponseContent = await response.Content.ReadAsStringAsync();
+
+                        if (response.IsSuccessStatusCode)
+                            return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!retry || currentRetries >= Retries)
+                        {
+                            throw;
+                        }
+                    }
+                    finally
+                    {
+                        currentRetries++;
+                    }
+                    // Add some delay to avoid spamming the API
+                    Thread.Sleep(500 * currentRetries);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return false;
+        }
+
+
+
         public Task<ExpressResponse<IEnumerable<ExpressNft>>> GetOwnedNftsAsync(string address, bool retry = true)
         {
             var url = $"{ExpressApiUrl}/nft/owned/{address}";
             return SendRequestAsync<IEnumerable<ExpressNft>>(url, "GET");
+        }
+
+        public Task<bool> ClaimNftsAsync(int tokenId, int amount, bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}//nft/claim";
+            var body = new
+            {
+                tokenId,
+                amount
+            };
+            return SendRequestAsync(url, "POST", body);
         }
     }
 }
