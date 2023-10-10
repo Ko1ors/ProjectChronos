@@ -2,9 +2,9 @@
 
 namespace ProjectChronos.Common.Models.ExpressApi
 {
-    public class ExpressNft : ExpressNftBase
+    public class ExpressPack : ExpressNftBase
     {
         [JsonProperty("metadata")]
-        public NftMetadata Metadata { get; set; }
+        public PackMetadata Metadata { get; set; }
     }
 }

@@ -13,6 +13,8 @@ namespace ProjectChronos.Services
 
         private string ExpressApiUrl => Configuration["ExpressUrl"];
 
+        private int Retries => int.Parse(Configuration["ExpressRequestRetries"]);
+
         private HttpClient HttpClient
         {
             get
@@ -36,7 +38,7 @@ namespace ProjectChronos.Services
             }
         }
 
-        public async Task<ExpressResponse<T>> SendRequestAsync<T>(string url, string method, object body = null)
+        public async Task<ExpressResponse<T>> SendRequestAsync<T>(string url, string method, object body = null, bool retry = true)
         {
             try
             {
@@ -47,24 +49,45 @@ namespace ProjectChronos.Services
                     request.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
                 }
 
-                var response = HttpClient.SendAsync(request).Result;
-                var responseContent = await response.Content.ReadAsStringAsync();
+                var maxRetries = retry ? Retries : 1;
+                var currentRetries = 0;
+                var lastResponseContent = string.Empty;
 
-                if (response.IsSuccessStatusCode)
+                while (currentRetries < maxRetries)
                 {
-                    var responseObject = JsonConvert.DeserializeObject<T>(responseContent);
-                    return new ExpressResponse<T>
+                    try
                     {
-                        Success = true,
-                        Data = responseObject,
-                        Message = "Success"
-                    };
+                        var response = await HttpClient.SendAsync(request);
+                        lastResponseContent = await response.Content.ReadAsStringAsync();
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseObject = JsonConvert.DeserializeObject<T>(lastResponseContent, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                            return new ExpressResponse<T>
+                            {
+                                Success = true,
+                                Data = responseObject,
+                                Message = "Success"
+                            };
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!retry || currentRetries >= Retries)
+                        {
+                            throw;
+                        }
+                    }
+                    finally
+                    {
+                        currentRetries++;
+                    }
                 }
 
                 return new ExpressResponse<T>
                 {
                     Success = false,
-                    Message = JsonConvert.DeserializeObject<ExpressError>(responseContent)?.Error ?? "Unknown error"
+                    Message = JsonConvert.DeserializeObject<ExpressError>(lastResponseContent)?.Error ?? "Unknown error"
                 };
             }
             catch (Exception ex)
@@ -79,10 +102,10 @@ namespace ProjectChronos.Services
         }
 
 
-        public Task<ExpressResponse<Metadata>> GetOwnedNftsAsync(string address)
+        public Task<ExpressResponse<IEnumerable<ExpressNft>>> GetOwnedNftsAsync(string address, bool retry = true)
         {
-            var url = $"{ExpressApiUrl}/api/nft/owned/{address}";
-            return SendRequestAsync<Metadata>(url, "GET");
+            var url = $"{ExpressApiUrl}/nft/owned/{address}";
+            return SendRequestAsync<IEnumerable<ExpressNft>>(url, "GET");
         }
     }
 }
