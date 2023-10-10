@@ -22,14 +22,17 @@
                 <li class="nav-item">
 
                     <router-link class="nav-link" to="/AboutChronos">About Chronos
-                        <img class="profile" src="../resources/Profile.png" alt="Profile">
                     </router-link>
                 </li>
             </ul>
         </div>
     </nav>
+
+
+    <div class="info">
+        <slot />
+    </div>
     <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
-    <slot />
 </template>
 
 <style scoped>
@@ -40,6 +43,11 @@
 
 .navbar {
     background-color: var(--surface-overlay);
+}
+
+.info {
+    padding-bottom: 128px;
+    min-height: calc(100vh - 59px);
 }
 
 .profile {
@@ -61,27 +69,13 @@
     font-family: 'Times New Roman', Times, serif;
     font-size: 60px;
 }
-
-.footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 2rem;
-    background-color: var(--surface-card);
-    color: black;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.2rem;
-}
 </style>
 
 <style>
 body {
     min-height: 100vh;
     background-color: var(--surface-ground) !important;
+    position: relative;
 }
 </style>
 

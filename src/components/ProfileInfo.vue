@@ -56,6 +56,7 @@ async function getTx(tokenId: number, amount: number, contract: Pack) {
         {{ packs }}
         {{ tx }}
     </TemplateVue>
+    <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
 </template>
 
 <style scoped>
