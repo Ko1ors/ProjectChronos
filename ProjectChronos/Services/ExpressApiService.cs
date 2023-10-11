@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using ProjectChronos.Common.Entities;
+using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Common.Models.ExpressApi;
 using System.Net;
@@ -43,13 +45,6 @@ namespace ProjectChronos.Services
         {
             try
             {
-                var request = new HttpRequestMessage(new HttpMethod(method), url);
-
-                if (body != null)
-                {
-                    request.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-                }
-
                 var maxRetries = retry ? Retries : 1;
                 var currentRetries = 0;
                 var lastResponseContent = string.Empty;
@@ -58,6 +53,13 @@ namespace ProjectChronos.Services
                 {
                     try
                     {
+                        var request = new HttpRequestMessage(new HttpMethod(method), url);
+
+                        if (body != null)
+                        {
+                            request.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+                        }
+
                         var response = await HttpClient.SendAsync(request);
                         lastResponseContent = await response.Content.ReadAsStringAsync();
 
@@ -152,23 +154,34 @@ namespace ProjectChronos.Services
             return false;
         }
 
-
-
         public Task<ExpressResponse<IEnumerable<ExpressNft>>> GetOwnedNftsAsync(string address, bool retry = true)
         {
             var url = $"{ExpressApiUrl}/nft/owned/{address}";
-            return SendRequestAsync<IEnumerable<ExpressNft>>(url, "GET");
+            return SendRequestAsync<IEnumerable<ExpressNft>>(url, "GET", retry: retry);
+        }
+
+        public Task<ExpressResponse<IEnumerable<ExpressPack>>> GetOwnedPacksAsync(string address, bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/packs/owned/{address}";
+            return SendRequestAsync<IEnumerable<ExpressPack>>(url, "GET", retry: retry);
         }
 
         public Task<bool> ClaimNftsAsync(int tokenId, int amount, bool retry = true)
         {
-            var url = $"{ExpressApiUrl}//nft/claim";
+            var url = $"{ExpressApiUrl}/nft/claim";
             var body = new
             {
                 tokenId,
                 amount
             };
-            return SendRequestAsync(url, "POST", body);
+            return SendRequestAsync(url, "POST", body, retry: retry);
+        }
+
+        public Task<bool> CreatePacksAsync(ICardPackTemplate packTemplate, string internalId = "", bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/packs/create";
+            var body = new CreatePackRequestBody(packTemplate, internalId);
+            return SendRequestAsync(url, "POST", body, retry: retry);
         }
     }
 }

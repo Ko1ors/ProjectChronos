@@ -1,4 +1,5 @@
-﻿using ProjectChronos.Common.Interfaces.Entities;
+﻿using ProjectChronos.Common.Entities;
+using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Models.Enums;
 
 namespace ProjectChronos.Common.Interfaces.Services
@@ -7,11 +8,11 @@ namespace ProjectChronos.Common.Interfaces.Services
     {
         bool EnsureWelcomePackTemplateExists();
 
-        int CreatePacks(int cardPackTemplateId);
+        Task<CreatedPacks> CreatePacksAsync(int cardPackTemplateId);
 
-        int CreatePacks(CardPackType type);
+        Task<CreatedPacks> CreatePacksAsync(CardPackType type);
 
-        int CreatePacks(ICardPackTemplate packTemplate);
+        Task<CreatedPacks> CreatePacksAsync(ICardPackTemplate packTemplate);
 
         int GetPacksRemaining(CardPackType type);
     }

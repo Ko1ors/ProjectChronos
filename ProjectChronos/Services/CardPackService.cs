@@ -13,7 +13,12 @@ namespace ProjectChronos.Services
         private readonly IExpressApiService _expressApiService;
         private readonly IConfiguration Configuration;
 
-        private readonly string _contractAddress = "";
+        private string ContractAddress => Configuration["ContractAddress"];
+
+        private string OwnerAddress => Configuration["OwnerAddress"];
+
+        private int Retries => int.Parse(Configuration["ExpressRequestRetries"]);
+
 
         private readonly CardPackTemplate _welcomePackTemplate = new CardPackTemplate()
         {
@@ -48,32 +53,190 @@ namespace ProjectChronos.Services
             _expressApiService = expressApiService;
             Configuration = configuration;
 
-
             // Check if contract address is set
-            if (string.IsNullOrEmpty(Configuration["ContractAddress"]))
+            if (string.IsNullOrEmpty(ContractAddress))
             {
                 throw new Exception("Contract address not set in configuration");
             }
-
-            _contractAddress = Configuration["ContractAddress"]!;
+            // Check if owner address is set
+            if (string.IsNullOrEmpty(OwnerAddress))
+            {
+                throw new Exception("Owner address not set in configuration");
+            }
 
             // Update contract address on welcome pack template
-            _welcomePackTemplate.RewardTemplates.ToList().ForEach(x => x.ContractAddress = _contractAddress);
+            _welcomePackTemplate.RewardTemplates.ToList().ForEach(x => x.ContractAddress = ContractAddress);
         }
 
-        public int CreatePacks(int cardPackTemplateId)
+        public Task<CreatedPacks> CreatePacksAsync(int cardPackTemplateId)
         {
-            throw new NotImplementedException();
+            var packTemplate = _dbContext.CardPackTemplates
+                .Include(cpt => cpt.RewardTemplates)
+                .FirstOrDefault(x => x.Id == cardPackTemplateId);
+
+            if(packTemplate == null)
+            {
+                throw new Exception($"Card pack template not found for id {cardPackTemplateId}");
+            }
+
+            return CreatePacksAsync(packTemplate);
         }
 
-        public int CreatePacks(CardPackType type)
+        public Task<CreatedPacks> CreatePacksAsync(CardPackType type)
         {
-            throw new NotImplementedException();
+            var packTemplate = _dbContext.CardPackTemplates
+                .Include(cpt => cpt.RewardTemplates)
+                .FirstOrDefault(x => x.Type == type);
+
+            if(packTemplate == null)
+            {
+                throw new Exception($"Card pack template not found for type {type}");
+            }
+
+            return CreatePacksAsync(packTemplate);
         }
 
-        public int CreatePacks(ICardPackTemplate packTemplate)
+        private record RewardsToCreate
         {
-            throw new NotImplementedException();
+            public ICardPackRewardTemplate RewardTemplate;
+            public int Quantity;
+        }
+
+        public async Task<CreatedPacks> CreatePacksAsync(ICardPackTemplate packTemplate)
+        {
+            if (packTemplate == null)
+            {
+                throw new Exception("Card pack template is null");
+            }
+            if(packTemplate.RewardTemplates == null || packTemplate.RewardTemplates.Count == 0)
+            {
+                throw new Exception("Card pack template has no rewards");
+            }
+
+            var rewards = packTemplate.RewardTemplates.ToList();
+            
+
+            // Check if NFTs exist for each reward
+            var ownedNftsResponse = await _expressApiService.GetOwnedNftsAsync(OwnerAddress);
+            if(!ownedNftsResponse.Success || ownedNftsResponse.Data is null)
+            {
+                throw new Exception("Failed to get owned NFTs");
+            }
+
+            var ownedNfts = ownedNftsResponse.Data.ToList();
+            var rewardsToCreate = new List<RewardsToCreate>();
+            foreach (var reward in rewards)
+            {
+                var ownedNft = ownedNftsResponse.Data.FirstOrDefault(nft => nft.Metadata.Id == reward.TokenId.ToString());
+                if(ownedNft == null)
+                {
+                    rewardsToCreate.Add(new RewardsToCreate()
+                    {
+                        RewardTemplate = reward,
+                        Quantity = reward.TotalRewards
+                    });
+                }
+                else if(int.Parse(ownedNft.QuantityOwned) < reward.TotalRewards)
+                {
+                    rewardsToCreate.Add(new RewardsToCreate()
+                    {
+                        RewardTemplate = reward,
+                        Quantity = reward.TotalRewards - int.Parse(ownedNft.QuantityOwned)
+                    });
+                }
+            }
+
+            // Create missing NFTs for each reward
+            var groupedToCreate = rewardsToCreate.GroupBy(x => x.RewardTemplate.TokenId);
+
+            foreach (var group in groupedToCreate)
+            {
+                var token = group.Key;
+                var quantity = group.Sum(x => x.Quantity);
+
+                var currentRetries = 0;
+                var nftCreated = false;
+
+                // Inception loop
+                while (currentRetries < Retries && !nftCreated)
+                {
+                    try
+                    {
+                        var createNftResponse = await _expressApiService.ClaimNftsAsync(token, quantity);
+                        if(!createNftResponse)
+                        {
+                            continue;
+                        }
+
+                        // now refetch owned nfts to see if they were created
+                        ownedNftsResponse = await _expressApiService.GetOwnedNftsAsync(OwnerAddress);
+                        if (!ownedNftsResponse.Success || ownedNftsResponse.Data is null)
+                        {
+                            throw new Exception("Failed to get owned NFTs");
+                        }
+                        ownedNfts = ownedNftsResponse.Data.ToList();
+
+                        if(createNftResponse && ownedNfts.Any(nft => nft.Metadata.Id == token.ToString() && int.Parse(nft.QuantityOwned) >= quantity))
+                        {
+                            nftCreated = true;
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                    finally
+                    {
+                        currentRetries++;
+                    }
+                    // Add some delay to avoid spamming the API
+                    Thread.Sleep(500 * currentRetries);
+                }
+
+                if(!nftCreated)
+                {
+                    throw new Exception($"Failed to create NFTs for token {token} and quantity {quantity} after multiple retries");
+                }
+            }
+
+            // Now all NFTs should exist, time to create packs
+
+            var internalId = Guid.NewGuid().ToString();
+            var packsCreated = await _expressApiService.CreatePacksAsync(packTemplate, internalId);
+            if(!packsCreated)
+            {
+                throw new Exception("Failed to create packs");
+            }
+
+            // Refetch owned packs to see if they were created
+            // TODO: both packs and nfts creation can take a while, so we should probably wait a bit before refetching
+            var ownedPacksResponse = await _expressApiService.GetOwnedPacksAsync(OwnerAddress);
+            if (!ownedPacksResponse.Success || ownedPacksResponse.Data is null)
+            {
+                throw new Exception("Failed to get owned packs");
+            }
+
+            var ownedPacks = ownedPacksResponse.Data.ToList();
+            var createdPack = ownedPacks.FirstOrDefault(pack => pack.Metadata.InternalId == internalId);
+            if(createdPack == null)
+            {
+                throw new Exception($"Failed to find created pack with internal id {internalId}");
+            }
+
+            // Pack created, now we need to insert it into the database
+            var createdPackEntity = new CreatedPacks()
+            {
+                CardPackTemplateId = packTemplate.Id,
+                QuantityRemaining = int.Parse(createdPack.QuantityOwned),
+                Quantity = int.Parse(createdPack.QuantityOwned),
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            _dbContext.CreatedPacks.Add(createdPackEntity);
+            _dbContext.SaveChanges();
+
+            return createdPackEntity;
         }
 
         public bool EnsureWelcomePackTemplateExists()

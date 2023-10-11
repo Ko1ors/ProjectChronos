@@ -36,7 +36,7 @@ namespace ProjectChronos.Services
 
                 if (cardPackService.GetPacksRemaining(CardPackType.WelcomePack) < MinPacksQuantity)
                 {
-
+                    cardPackService.CreatePacksAsync(CardPackType.WelcomePack);
                 }
             }
         }
