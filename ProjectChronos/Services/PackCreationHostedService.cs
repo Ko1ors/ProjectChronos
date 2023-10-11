@@ -17,7 +17,7 @@ namespace ProjectChronos.Services
         }
 
 
-            public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
 
             _timer = new Timer(Execute, null, TimeSpan.Zero,
@@ -28,17 +28,23 @@ namespace ProjectChronos.Services
 
         private void Execute(object? state)
         {
-            using (var scope = _services.CreateScope())
+            // We need to await all the async calls, so we need to use Task.Run
+            // In other case EF Core will dispose DB context and throw an exception
+            Task.Run(async () =>
             {
-                var cardPackService =
-                    scope.ServiceProvider
-                        .GetRequiredService<ICardPackService>();
-
-                if (cardPackService.GetPacksRemaining(CardPackType.WelcomePack) < MinPacksQuantity)
+                using (var scope = _services.CreateScope())
                 {
-                    cardPackService.CreatePacksAsync(CardPackType.WelcomePack);
+                    var cardPackService =
+                            scope.ServiceProvider
+                                .GetRequiredService<ICardPackService>();
+
+                    if (cardPackService.GetPacksRemaining(CardPackType.WelcomePack) < MinPacksQuantity)
+                    {
+                        await cardPackService.CreatePacksAsync(CardPackType.WelcomePack);
+                    }
                 }
             }
+            );
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

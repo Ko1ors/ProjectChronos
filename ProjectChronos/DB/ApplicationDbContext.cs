@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectChronos.Common.Entities;
 using System.Collections.Generic;
 using System.Collections;
+using System.Reflection;
 
 namespace ProjectChronos.DB
 {
@@ -37,6 +38,22 @@ namespace ProjectChronos.DB
             modelBuilder.Entity<CreatedPacks>()
                 .HasOne(cprt => cprt.CardPackTemplate as CardPackTemplate)
                 .WithMany(cpt => cpt.CreatedPacks as ICollection<CreatedPacks>);
+        }
+
+        // For debug purposes
+        // This method is used to check if the DbContext is disposed
+        public bool IsDisposed()
+        {
+            bool result = true;
+            var typeDbContext = typeof(DbContext);
+            var isDisposedTypeField = typeDbContext.GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (isDisposedTypeField != null)
+            {
+                result = (bool)isDisposedTypeField.GetValue(this);
+            }
+
+            return result;
         }
     }
 }
