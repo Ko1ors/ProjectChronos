@@ -206,17 +206,6 @@ import TemplateVue from './TemplateVue.vue'
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3">
-                <div class="card  mb-3">
-                    <div class="card-header">Support</div>
-                    <div class="card-body">
-                        <p class="card-text">The Support category represents cards that provide utility and assist other
-                            cards on the battlefield. These cards may have lower attack values but offer unique abilities
-                            that heal allies, strengthen other cards, or disrupt enemy strategies. They are crucial for
-                            providing tactical support and strategic options.</p>
-                    </div>
-                </div>
-            </div>
         </div>
         <h1 class="text-center">Card Attributes</h1>
         <div class="row m-2 overflow-auto">
