@@ -4,7 +4,7 @@ import 'dotenv/config'
 import { Request, Response, Router } from 'express';
 import getPrivateSdk from '../shared/getPrivateSdk';
 
-const elements = ["Chronos", "Gaia", "Aether"] as const;
+const elements = ["Chronos", "Umbra", "Aether", "Cryo"] as const;
 export type Element = typeof elements[number];
 
 const classes = ["Melee", "Ranged"] as const;
