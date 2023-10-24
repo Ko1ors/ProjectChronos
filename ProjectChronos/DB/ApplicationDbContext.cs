@@ -1,9 +1,7 @@
-﻿using ProjectChronos.Entities;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectChronos.Common.Entities;
-using System.Collections.Generic;
-using System.Collections;
+using ProjectChronos.Entities;
 using System.Reflection;
 
 namespace ProjectChronos.DB
@@ -38,6 +36,14 @@ namespace ProjectChronos.DB
             modelBuilder.Entity<CreatedPacks>()
                 .HasOne(cprt => cprt.CardPackTemplate as CardPackTemplate)
                 .WithMany(cpt => cpt.CreatedPacks as ICollection<CreatedPacks>);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.UserDecks as ICollection<UserDeck>)
+                .WithOne(ud => ud.User as User);
+
+            modelBuilder.Entity<UserDeck>()
+                .HasMany(ud => ud.DeckCards as ICollection<DeckCard>)
+                .WithOne(dc => dc.UserDeck as UserDeck);
         }
 
         // For debug purposes
