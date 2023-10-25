@@ -14,6 +14,10 @@ namespace ProjectChronos.DB
 
         public DbSet<CreatedPacks> CreatedPacks { get; set; }
 
+        public DbSet<DeckCard> DeckCards { get; set; }
+
+        public DbSet<UserDeck> UserDecks { get; set; }
+
         public ApplicationDbContext()
         {
 
