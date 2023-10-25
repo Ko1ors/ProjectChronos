@@ -8,8 +8,6 @@
 
         public int Quantity { get; set; }
 
-        public bool Active { get; set; }
-
         public IUserDeck UserDeck { get; set; }
     }
 }

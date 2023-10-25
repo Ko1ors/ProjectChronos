@@ -12,7 +12,7 @@ namespace ProjectChronos.Migrations
         {
             migrationBuilder.AddColumn<bool>(
                 name: "Active",
-                table: "DeckCard",
+                table: "UserDeck",
                 type: "bit",
                 nullable: false,
                 defaultValue: false);
@@ -23,7 +23,7 @@ namespace ProjectChronos.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Active",
-                table: "DeckCard");
+                table: "UserDeck");
         }
     }
 }

@@ -12,7 +12,7 @@ using ProjectChronos.DB;
 namespace ProjectChronos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231025193704_DeckActiveColumn")]
+    [Migration("20231025194021_DeckActiveColumn")]
     partial class DeckActiveColumn
     {
         /// <inheritdoc />
@@ -293,6 +293,9 @@ namespace ProjectChronos.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

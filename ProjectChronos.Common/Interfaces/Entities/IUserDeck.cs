@@ -6,6 +6,8 @@
 
         public string Name { get; set; }
 
+        public bool Active { get; set; }
+
         public IUser User { get; set; }
 
         public ICollection<IDeckCard> DeckCards { get; set; }
