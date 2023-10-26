@@ -12,12 +12,16 @@ import TemplateVue from './TemplateVue.vue'
     </TemplateVue>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 h1 {
     text-align: center;
     font-family: 'Times New Roman', Times, serif;
-    font-size: 140px;
+    font-size: 80px;
     padding-top: 250px;
+
+    @include media-breakpoint-up(md) {
+        font-size: 140px;
+    }
 }
 
 h3 {

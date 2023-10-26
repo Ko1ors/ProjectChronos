@@ -7,7 +7,7 @@ import TemplateVue from './TemplateVue.vue'
 <template>
     <TemplateVue>
         <h1 class="text-center">Features</h1>
-        <div class="row m-2 overflow-auto">
+        <div class="row m-2 row-cols-lg-4 row-cols-md-2 row-cols-1 overflow-auto">
             <div class="col-sm-3">
                 <div class="card  mb-3">
                     <div class="card-header">Card Creation and Tokenization</div>
@@ -141,7 +141,7 @@ import TemplateVue from './TemplateVue.vue'
             </div>
         </div>
         <h1 class="text-center">Card Elements</h1>
-        <div class="row m-2 overflow-auto">
+        <div class="row row-cols-lg-4 row-cols-md-2 row-cols-1 m-2 overflow-auto">
             <div class="col-sm-3">
                 <div class="card  mb-3">
                     <div class="card-header">Aether</div>
@@ -184,7 +184,7 @@ import TemplateVue from './TemplateVue.vue'
             </div>
         </div>
         <h1 class="text-center">Card Classes</h1>
-        <div class="row m-2 overflow-auto">
+        <div class="row row-cols-lg-4 row-cols-md-2 row-cols-1 m-2 overflow-auto">
             <div class="col-sm-3">
                 <div class="card  mb-3">
                     <div class="card-header">Melee</div>
@@ -208,7 +208,7 @@ import TemplateVue from './TemplateVue.vue'
             </div>
         </div>
         <h1 class="text-center">Card Attributes</h1>
-        <div class="row m-2 overflow-auto">
+        <div class="row row-cols-lg-4 row-cols-md-2 row-cols-1 m-2 overflow-auto">
             <div class="col-sm-3">
                 <div class="card  mb-3">
                     <div class="card-header">Attack Power</div>
@@ -274,7 +274,7 @@ import TemplateVue from './TemplateVue.vue'
 .card {
     display: block;
     position: relative;
-    height: 220px;
+    height: 250px;
     color: var(--primary-color-text);
     background-color: var(--primary-color);
     overflow: hidden;

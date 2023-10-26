@@ -95,7 +95,7 @@ const signMessageAsync = async () => {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
-  <div class="col-lg-4 meta-form mx-auto">
+  <div class="col-lg-4 meta-form">
     <h4 class="wallet-text">Connect with your wallet to access your profile</h4>
     <Button @click="connectMetamask" class="button-metamask">
       <img class="fox" src="/src/resources/MetaMask_Fox.svg.png" alt="Metamask" />
@@ -106,7 +106,7 @@ const signMessageAsync = async () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .meta-form {
   border: 2px solid;
   height: 300px;
@@ -117,6 +117,18 @@ const signMessageAsync = async () => {
   flex-direction: column;
   padding: 20px;
   align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  @include media-breakpoint-up(md) {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+
+  @include media-breakpoint-up(lg) {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .p-button {
@@ -145,5 +157,9 @@ const signMessageAsync = async () => {
 .content {
   background-color: var(--surface-ground);
   height: 100vh;
+}
+
+.wallet-text {
+  text-align: center;
 }
 </style>

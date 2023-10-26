@@ -3,9 +3,9 @@
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand">Menu</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -35,7 +35,7 @@
     <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .navbar-brand {
     margin-left: 10px;
     margin-bottom: 3px;
@@ -68,6 +68,18 @@
     text-align: center;
     font-family: 'Times New Roman', Times, serif;
     font-size: 60px;
+}
+
+.nav-item {
+    margin-left: 10px;
+
+    @include media-breakpoint-up(lg) {
+        margin-left: 0px;
+    }
+}
+
+.navbar-toggler {
+    margin-right: 10px;
 }
 </style>
 
