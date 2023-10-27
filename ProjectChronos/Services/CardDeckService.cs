@@ -132,13 +132,11 @@ namespace ProjectChronos.Services
                     return false;
 
                 // Mark all other decks as inactive if this one is active
-
                 foreach (var userDeck in user.UserDecks.Where(d => d.Active))
                 {
                     userDeck.Active = false;
                 }
                 deckToActivate.Active = true;
-
 
                 _dbContext.SaveChanges();
                 return true;
