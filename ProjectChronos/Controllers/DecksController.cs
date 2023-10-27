@@ -31,7 +31,7 @@ namespace ProjectChronos.Controllers
         public async Task<IActionResult> CreateCardDeck([FromBody] CreateCardDeckRequest request)
         {
             var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            return Ok(await _cardDeckService.CreateCardDeckAsync(currentUser, request.Cards.Select(c => c.ToDeckCard())));
+            return Ok(await _cardDeckService.CreateCardDeckAsync(currentUser, request.Cards.Select(c => c.ToDeckCard()), request.Active));
         }
 
         // Update existing card deck
@@ -40,7 +40,7 @@ namespace ProjectChronos.Controllers
         public async Task<IActionResult> UpdateCardDeck([FromBody] UpdateCardDeckRequest request)
         {
             var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            return Ok(await _cardDeckService.UpdateCardDeckAsync(currentUser, request.DeckId, request.Cards.Select(c => c.ToDeckCard())));
+            return Ok(await _cardDeckService.UpdateCardDeckAsync(currentUser, request.DeckId, request.Cards.Select(c => c.ToDeckCard()), request.Active));
         }
 
         // Delete existing card deck

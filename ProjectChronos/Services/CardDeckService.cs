@@ -45,7 +45,7 @@ namespace ProjectChronos.Services
             return false;
         }
 
-        public async Task<bool> CreateCardDeckAsync(IUser user, IEnumerable<IDeckCard> cards)
+        public async Task<bool> CreateCardDeckAsync(IUser user, IEnumerable<IDeckCard> cards, bool active = false)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace ProjectChronos.Services
                 var deck = new UserDeck
                 {
                     User = user,
-                    Active = true,
+                    Active = active,
                     DeckCards = new Collection<IDeckCard>(cards.ToList()),
                 };
 
@@ -100,7 +100,7 @@ namespace ProjectChronos.Services
         }
 
 
-        public async Task<bool> UpdateCardDeckAsync(IUser user, int deckId, IEnumerable<IDeckCard> cards)
+        public async Task<bool> UpdateCardDeckAsync(IUser user, int deckId, IEnumerable<IDeckCard> cards, bool active = false)
         {
             try
             {
@@ -111,7 +111,13 @@ namespace ProjectChronos.Services
                     return false;
                 deckToUpdate.DeckCards = new Collection<IDeckCard>(cards.ToList());
 
+                if (active)
+                    MarkAsActive(user, deckId);
+                else
+                    deckToUpdate.Active = false;
+
                 _dbContext.SaveChanges();
+
                 return true;
             }
             catch (Exception e)
