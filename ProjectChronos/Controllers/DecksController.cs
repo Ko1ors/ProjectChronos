@@ -24,6 +24,24 @@ namespace ProjectChronos.Controllers
             _memoryCache = memoryCache;
         }
 
+        // Get active deck
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetActiveDeck()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(_cardDeckService.GetActiveUserDeck(currentUser));
+        }
+
+        // Get all card decks
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllCardDecks()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(_cardDeckService.GetAllUserDecks(currentUser));
+        }
+
 
         // Create new card deck
         [HttpPost]

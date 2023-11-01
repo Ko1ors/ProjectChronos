@@ -153,5 +153,32 @@ namespace ProjectChronos.Services
             }
             return false;
         }
+
+        public UserDeck GetActiveUserDeck(IUser user)
+        {
+            try
+            {
+                return user.UserDecks.FirstOrDefault(d => d.Active) as UserDeck;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return default;
+        }
+
+        public IEnumerable<UserDeck> GetAllUserDecks(IUser user)
+        {
+            try
+            {
+                return (IEnumerable<UserDeck>)user.UserDecks.ToList();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return default;
+
+        }
     }
 }
