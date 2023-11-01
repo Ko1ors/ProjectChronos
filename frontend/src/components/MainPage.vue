@@ -8,7 +8,6 @@ import TemplateVue from './TemplateVue.vue'
     <TemplateVue>
         <h1>Chronos</h1>
         <h3>Please select the menu section you need</h3>
-        <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
     </TemplateVue>
 </template>
 
@@ -31,21 +30,6 @@ h3 {
 </style>
 
 <style>
-.footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 2rem;
-    background-color: var(--surface-card);
-    color: black;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80px;
-}
-
 #app {
     position: relative;
 }

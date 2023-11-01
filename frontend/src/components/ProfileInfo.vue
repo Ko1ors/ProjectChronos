@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 
 import { ref, onBeforeMount } from 'vue'
@@ -6,6 +7,8 @@ import TemplateVue from './TemplateVue.vue'
 import { MetaMaskWallet } from "@thirdweb-dev/wallets";
 import { Mumbai } from "@thirdweb-dev/chains";
 import { ThirdwebSDK, type Pack, type NFT } from "@thirdweb-dev/sdk";
+import range from "../resources/ranged.png"
+import melee from "../resources/melee.png"
 
 let packs = ref<NFT[]>([]);
 let tx: Transaction;
@@ -31,6 +34,23 @@ let mapRarity = new Map([
     ["Legendary", "orange"]
 ]);
 
+function getCardRarity(rarity: string) {
+    switch (rarity) {
+        case "Common":
+            return "common-border";
+        case "Rare":
+            return "rare-border";
+        case "Epic":
+            return "epic-border";
+        case "Legendary":
+            return "legendary-border";
+    }
+}
+
+function getCardClass(cardClass: string) {
+    if (cardClass === "Ranged") return range
+    else if (cardClass === "Melee") return melee
+}
 
 onBeforeMount(async () => {
     const wallet = new MetaMaskWallet({
@@ -41,22 +61,16 @@ onBeforeMount(async () => {
     // connect wallet
     await wallet.connect();
 
-    // const sdk = await ThirdwebSDK.fromWallet(wallet, "mumbai", {
-    //     clientId: "b4b85c7265a5e23dae86b0085ca57083", // Use client id if using on the client side, get it from dashboard settings
-    // });
     const sdk = await ThirdwebSDK.fromWallet(wallet, "mumbai", {
         clientId: "b4b85c7265a5e23dae86b0085ca57083", // Use client id if using on the client side, get it from dashboard settings
     });
-    const address = "0x74a18a8512A34352211bb8FF3D3a178c62036523";
+    const address = await wallet.getAddress();
 
-    const contract = await sdk.getContract("0x7aC679510407263603d4D17C754Fa12EEc810234", "pack");
-    const contractCards = await sdk.getContract("0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508");
-
+    const contract = await sdk.getContract(import.meta.env.VITE_PACKS_CONTRACT, "pack");
+    const contractCards = await sdk.getContract(import.meta.env.VITE_CARDS_CONTRACT);
 
     packs.value = await contract.getOwned(address);
 
-    const tokenId = 0
-    // const amount = 1
     cards.value = await contractCards.erc1155.getOwned(address);
 })
 
@@ -66,12 +80,8 @@ onBeforeMount(async () => {
     <TemplateVue>
         <div class="row row-cols-lg-6 row-cols-md-3 row-cols-2 overflow-auto">
             <div class="col" v-for="card in cards" :key="card.metadata.id">
-                <div class="card" :class="{
-                    'epic-border': card.metadata.rarity === 'Epic',
-                    'common-border': card.metadata.rarity === 'Common',
-                    'rare-border': card.metadata.rarity === 'Rare',
-                    'legendary-border': card.metadata.rarity === 'Legendary'
-                }" :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
+                <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
+                    :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
                     <div class="header">
                         <div class="name">{{ card.metadata.name }}</div>
                         <div class="count" v-if="(card.quantityOwned as unknown as number) > 1">x{{ card.quantityOwned }}
@@ -95,10 +105,7 @@ onBeforeMount(async () => {
                     </div>
                     <div>
                         <div class="card-element">{{ mapSymbolOfElement.get(card.metadata.element as string) }}</div>
-                        <img class="class-img" v-if="card.metadata.class === 'Ranged'" src="../resources/ranged.png"
-                            alt="Card class">
-                        <img class="class-img" v-if="card.metadata.class === 'Melee'" src="../resources/melee.png"
-                            alt="Card class">
+                        <img class="class-img" :src="getCardClass(card.metadata.class as string)" alt="Card class">
                     </div>
                 </div>
             </div>

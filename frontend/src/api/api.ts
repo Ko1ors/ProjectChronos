@@ -30,60 +30,8 @@ export const logoutAsync = async function (): Promise<Response<boolean>> {
   return response
 }
 
-export const getImagesAsync = async function (): Promise<Response<string[]>> {
-  const response = getAsync<string[]>(`${apiUrl}/ItemImages`)
-  return response
-}
-
-export const uploadImageAsync = async function (
-  fileName: string,
-  file: any
-): Promise<Response<string>> {
-  const response = postAsync<string>(
-    `${apiUrl}/ItemImages/Upload`,
-    { Name: fileName, ImageBase64: file },
-    {}
-  )
-  return response
-}
-
-export const getContactMessagesAsync = async function (): Promise<Response<string[]>> {
-  const response = getAsync<string[]>(`${apiUrl}/Contact`)
-  return response
-}
-
 export const getAuthMessagesAsync = async function (address: string): Promise<Response<string>> {
   const response = getAsync<string>(`${apiUrl}/Users/GetAuthMessage?address=${address}`)
-  return response
-}
-
-export const createContactMessageAsync = async function (
-  name: string,
-  email: string,
-  message: string
-): Promise<Response<string>> {
-  const response = postAsync<string>(`${apiUrl}/Contact/Create`, {
-    Name: name,
-    Email: email,
-    Message: message
-  })
-  return response
-}
-
-export const deleteGameAccountAsync = async function (id: number): Promise<Response<boolean>> {
-  const response = deleteAsync<boolean>(`${apiUrl}/GameAccounts/Delete`, { GameAccountId: id })
-  return response
-}
-
-export const deleteItemDropTemplateAsync = async function (id: number): Promise<Response<boolean>> {
-  const response = deleteAsync<boolean>(`${apiUrl}/ItemDropTemplates/Delete`, {
-    ItemDropTemplateId: id
-  })
-  return response
-}
-
-export const deleteItemDropAsync = async function (id: number): Promise<Response<boolean>> {
-  const response = deleteAsync<boolean>(`${apiUrl}/ItemDrops/Delete`, { ItemDropId: id })
   return response
 }
 

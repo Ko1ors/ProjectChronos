@@ -1,6 +1,3 @@
-<script setup lang="ts">
-
-</script>
 
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -88,6 +85,21 @@ body {
     min-height: 100vh;
     background-color: var(--surface-ground) !important;
     position: relative;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background-color: var(--surface-card);
+    color: black;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
 }
 </style>
 

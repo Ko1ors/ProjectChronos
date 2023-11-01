@@ -1,20 +1,18 @@
 <script setup lang="ts">
 
-import FormMetanask from './FormMetamask.vue'
+import FormMetamask from './FormMetamask.vue'
 import TemplateVue from './TemplateVue.vue'
 
 </script>
 
 <template>
     <TemplateVue>
-        <meta charset="utf-8">
         <div class="content">
             <div class="section-title">
                 <h1 class="title">Welcome to chronos!</h1>
             </div>
-            <FormMetanask></FormMetanask>
+            <FormMetamask></FormMetamask>
         </div>
-        <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
     </TemplateVue>
 </template>
 

@@ -2,26 +2,17 @@
 import Button from 'primevue/button'
 import detectEthereumProvider from '@metamask/detect-provider';
 import MetaMaskOnboarding from '@metamask/onboarding'
-//import { MetaMaskSDK } from '@metamask/sdk';
 import { ref } from 'vue';
 import { Buffer } from 'buffer';
 import { getAuthMessagesAsync, loginAsync } from '../api/api';
 import type { Response } from '../api/api';
 
-// const options = {
-//     injectProvider: false,
-//     communicationLayerPreference: 'webrtc',
-// };
-// const MMSDK = new MetaMaskSDK(options);
-
-// const ethereum = MMSDK.getProvider();
 const isMetamaskConnected = ref(false);
 const connecting = ref(false);
 const onboarding = new MetaMaskOnboarding();
 const networkVersion = ref(0);
 const accounts = ref<string[]>([]);
 const sign = ref<string>("");
-const message = ref<string>("test message");
 let messageResponse: Response<string>;
 let responseInfo: string;
 
@@ -73,8 +64,7 @@ const signMessageAsync = async () => {
   // This uses a Node.js-style buffer shim in the browser.
   messageResponse = await getAuthMessagesAsync(accounts.value[0]);
   if (messageResponse.data) {
-    message.value = messageResponse.data;
-    const msg = `0x${Buffer.from(message.value, 'utf8').toString('hex')}`;
+    const msg = `0x${Buffer.from(messageResponse.data, 'utf8').toString('hex')}`;
     sign.value = await (provider as any).request({
       method: 'personal_sign',
       params: [msg, accounts.value[0]],
@@ -90,11 +80,6 @@ const signMessageAsync = async () => {
 </script>
 
 <template>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-
   <div class="col-lg-4 meta-form">
     <h4 class="wallet-text">Connect with your wallet to access your profile</h4>
     <Button @click="connectMetamask" class="button-metamask">
