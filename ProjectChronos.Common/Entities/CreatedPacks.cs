@@ -12,6 +12,8 @@ namespace ProjectChronos.Common.Entities
 
         public int QuantityRemaining { get; set; }
 
+        public string InternalId { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public ICardPackTemplate CardPackTemplate { get; set; }

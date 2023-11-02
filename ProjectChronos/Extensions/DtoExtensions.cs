@@ -1,5 +1,4 @@
-﻿using ProjectChronos.Common.Entities;
-using ProjectChronos.Common.Interfaces.Entities;
+﻿using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Models.DTOs;
 
 namespace ProjectChronos.Extensions
@@ -10,7 +9,7 @@ namespace ProjectChronos.Extensions
         {
             return new DeckCardDto
             {
-               // Id = deckCard.Id,
+                // Id = deckCard.Id,
                 CardId = deckCard.CardId,
                 Quantity = deckCard.Quantity
             };

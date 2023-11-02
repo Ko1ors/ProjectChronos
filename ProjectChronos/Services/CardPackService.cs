@@ -230,6 +230,7 @@ namespace ProjectChronos.Services
                 CardPackTemplateId = packTemplate.Id,
                 QuantityRemaining = int.Parse(createdPack.QuantityOwned),
                 Quantity = int.Parse(createdPack.QuantityOwned),
+                InternalId = internalId,
                 CreatedAt = DateTime.UtcNow,
             };
 
