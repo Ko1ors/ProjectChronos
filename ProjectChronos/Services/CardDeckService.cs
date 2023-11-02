@@ -1,4 +1,5 @@
-﻿using ProjectChronos.Common.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.DB;
@@ -31,7 +32,7 @@ namespace ProjectChronos.Services
                 foreach (var card in cards)
                 {
                     // Check if nft is owned
-                    if (!ownedNfts.Data.Any(n => int.Parse(n.Metadata.Id) == card.CardId && int.Parse(n.QuantityOwned) == card.Quantity))
+                    if (!ownedNfts.Data.Any(n => int.Parse(n.Metadata.Id) == card.CardId && int.Parse(n.QuantityOwned) >= card.Quantity))
                     {
                         return false;
                     }
@@ -45,6 +46,19 @@ namespace ProjectChronos.Services
             return false;
         }
 
+        private IEnumerable<UserDeck> GetUserDecks(IUser user)
+        {
+            try
+            {
+                return _dbContext.UserDecks.Include(d => d.DeckCards).Where(d => d.User.Id == user.Id).AsEnumerable();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return Enumerable.Empty<UserDeck>();
+        }
+
         public async Task<bool> CreateCardDeckAsync(IUser user, IEnumerable<IDeckCard> cards, bool active = false)
         {
             try
@@ -52,9 +66,12 @@ namespace ProjectChronos.Services
                 if (!await ValidateCardsOwnershipAsync(user, cards))
                     return false;
 
+                var userDecks = GetUserDecks(user);
+
                 var deck = new UserDeck
                 {
                     User = user,
+                    Name = $"Deck #{userDecks.Count() + 1}",
                     Active = active,
                     DeckCards = new Collection<IDeckCard>(cards.ToList()),
                 };
@@ -62,12 +79,13 @@ namespace ProjectChronos.Services
                 // Mark all other decks as inactive if this one is active
                 if (deck.Active)
                 {
-                    foreach (var userDeck in user.UserDecks.Where(d => d.Active))
+                    foreach (var userDeck in userDecks.Where(d => d.Active))
                     {
                         userDeck.Active = false;
                     }
                 }
 
+                _dbContext.Add(deck);
                 _dbContext.SaveChanges();
 
                 return true;
@@ -83,7 +101,7 @@ namespace ProjectChronos.Services
         {
             try
             {
-                var deckToDelete = user.UserDecks.FirstOrDefault(d => d.Id == deckId) as UserDeck;
+                var deckToDelete = GetUserDecks(user).FirstOrDefault(d => d.Id == deckId);
                 if (deckToDelete is null)
                     return false;
 
@@ -104,7 +122,7 @@ namespace ProjectChronos.Services
         {
             try
             {
-                var deckToUpdate = user.UserDecks.FirstOrDefault(d => d.Id == deckId) as UserDeck;
+                var deckToUpdate = GetUserDecks(user).FirstOrDefault(d => d.Id == deckId);
                 if (deckToUpdate is null)
                     return false;
                 if (!await ValidateCardsOwnershipAsync(user, cards))
@@ -131,14 +149,14 @@ namespace ProjectChronos.Services
         {
             try
             {
-                var deckToActivate = user.UserDecks.FirstOrDefault(d => d.Id == deckId) as UserDeck;
+                var deckToActivate = GetUserDecks(user).FirstOrDefault(d => d.Id == deckId);
                 if (deckToActivate is null)
                     return false;
                 if (deckToActivate.Active)
                     return false;
 
                 // Mark all other decks as inactive if this one is active
-                foreach (var userDeck in user.UserDecks.Where(d => d.Active))
+                foreach (var userDeck in GetUserDecks(user).Where(d => d.Active))
                 {
                     userDeck.Active = false;
                 }
@@ -158,27 +176,26 @@ namespace ProjectChronos.Services
         {
             try
             {
-                return user.UserDecks.FirstOrDefault(d => d.Active) as UserDeck;
+                return GetUserDecks(user).ToList().FirstOrDefault(d => d.Active);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            return default;
+            return null;
         }
 
         public IEnumerable<UserDeck> GetAllUserDecks(IUser user)
         {
             try
             {
-                return (IEnumerable<UserDeck>)user.UserDecks.ToList();
+                return GetUserDecks(user);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
             return default;
-
         }
     }
 }
