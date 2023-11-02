@@ -1,7 +1,9 @@
 ﻿using ProjectChronos.Common.Interfaces.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectChronos.Common.Entities
 {
+    [Table("DeckCards")]
     public class DeckCard : IDeckCard
     {
         public int Id { get; set; }
