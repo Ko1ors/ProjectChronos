@@ -18,5 +18,7 @@ namespace ProjectChronos.Common.Interfaces.Services
         Task<bool> CreatePacksAsync(ICardPackTemplate packTemplate, string internalId = "", bool retry = true);
 
         Task<bool> TransferPackAsync(int packId, string address, int amount, bool retry = true);
+
+        Task<ExpressResponse<ExpressPackContent>> GetPackContentAsync(int packId, bool retry = true);
     }
 }
