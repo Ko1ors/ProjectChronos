@@ -350,7 +350,7 @@ namespace ProjectChronos.Services
                 var pack = ownedPacksResponse.Data.FirstOrDefault(p => p.Metadata.InternalId == createdPack.InternalId);
                 // If pack quantity owned is 0, then it's not longer available
                 // Set quantity remaining to 0 and return
-                if(pack.QuantityOwned == "0")
+                if(pack is null || pack.QuantityOwned == "0")
                 {
                     createdPack.QuantityRemaining = 0;
                     _dbContext.SaveChanges();
