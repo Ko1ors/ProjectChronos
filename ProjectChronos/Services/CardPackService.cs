@@ -2,6 +2,7 @@
 using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
+using ProjectChronos.Common.Models;
 using ProjectChronos.Common.Models.Enums;
 using ProjectChronos.DB;
 
@@ -319,6 +320,76 @@ namespace ProjectChronos.Services
                 .Where(cp => cp.CardPackTemplate.Type == type)
                 .Select(cp => cp.QuantityRemaining)
                 .Sum();
+        }
+
+        public async Task<BaseServiceResult> ClaimPackAsync(IUser user, CardPackType type)
+        {
+            try
+            {
+                if(GetPacksRemaining(type) <= 0)
+                {
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "No packs remaining. Please try again later."
+                    };
+                };
+
+                // TODO: Additionally validate that user has not claimed a pack of this type in the last 24 hours
+
+                var createdPack = _dbContext.CreatedPacks
+                    .Include(cp => cp.CardPackTemplate)
+                    .FirstOrDefault(cp => cp.CardPackTemplate.Type == type && cp.QuantityRemaining > 0);
+
+                var ownedPacksResponse = await _expressApiService.GetOwnedPacksAsync(OwnerAddress);
+                if (!ownedPacksResponse.Success || ownedPacksResponse.Data is null)
+                {
+                    throw new Exception("Failed to get owned packs");
+                }
+
+                var pack = ownedPacksResponse.Data.FirstOrDefault(p => p.Metadata.InternalId == createdPack.InternalId);
+                // If pack quantity owned is 0, then it's not longer available
+                // Set quantity remaining to 0 and return
+                if(pack.QuantityOwned == "0")
+                {
+                    createdPack.QuantityRemaining = 0;
+                    _dbContext.SaveChanges();
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "No packs remaining. Please try again later."
+                    };
+                }
+      
+                var transferResult = await _expressApiService.TransferPackAsync(int.Parse(pack.Metadata.Id), user.UserName, 1, true);
+                if(!transferResult)
+                {
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "Failed to claim pack. Please try again later."
+                    };
+                }
+
+                createdPack.QuantityRemaining--;
+
+                _dbContext.SaveChanges();
+
+                return new BaseServiceResult()
+                {
+                    Success = true,
+                    Message = "Pack claimed successfully"
+                };
+            }
+            catch (Exception e)
+            {
+               
+            }
+            return new BaseServiceResult()
+            {
+                Success = false,
+                Message = "Failed to claim pack"
+            };          
         }
     }
 }

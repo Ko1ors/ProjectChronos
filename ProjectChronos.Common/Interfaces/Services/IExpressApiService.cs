@@ -16,5 +16,7 @@ namespace ProjectChronos.Common.Interfaces.Services
         Task<bool> ClaimNftsAsync(int tokenId, int amount, bool retry = true);
 
         Task<bool> CreatePacksAsync(ICardPackTemplate packTemplate, string internalId = "", bool retry = true);
+
+        Task<bool> TransferPackAsync(int packId, string address, int amount, bool retry = true);
     }
 }

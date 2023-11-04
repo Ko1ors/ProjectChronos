@@ -183,5 +183,17 @@ namespace ProjectChronos.Services
             var body = new CreatePackRequestBody(packTemplate, internalId);
             return SendRequestAsync(url, "POST", body, retry: retry);
         }
+
+        public Task<bool> TransferPackAsync(int packId, string address, int amount, bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/packs/transfer";
+            var body = new
+            {
+                tokenId = packId,
+                address,
+                amount
+            };
+            return SendRequestAsync(url, "POST", body, retry: retry);
+        }
     }
 }

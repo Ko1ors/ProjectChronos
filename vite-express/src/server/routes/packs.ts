@@ -115,7 +115,6 @@ router.post('/setApproval', async (req, res) => {
     res.send(result);
 });
 
-
 // Open a pack
 router.post('/open', async (req, res) => {
     // The token ID of the pack you want to open
@@ -137,6 +136,25 @@ router.get('/content/:tokenId', async (req, res) => {
     const contract = await getPacksContractAsync();
     const content = await contract.getPackContents(req.params.tokenId);
     res.send(content);
+});
+
+// Transfer pack
+router.post('/transfer', async (req, res) => {
+    // The token ID of the pack you want to send
+    // The address of the wallet you want to send the pack to 
+    // How many packs to transfer
+    let { tokenId, address, amount } = req.body;
+    if (!tokenId && tokenId !== 0)
+        return res.status(400).send('Token ID is required');
+    if (!address)
+        return res.status(400).send('To address is required');
+    if (!amount && amount !== 0)
+        amount = 1;
+
+    const sdk = getPrivateSdk();
+    const contract = await getPacksContractAsync(sdk);
+    const result = await contract.transfer(address, tokenId, amount);
+    res.send(result);
 });
 
 export default router;
