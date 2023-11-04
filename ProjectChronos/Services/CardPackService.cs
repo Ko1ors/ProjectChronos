@@ -422,5 +422,23 @@ namespace ProjectChronos.Services
             }
             return default;
         }
+
+        public async Task<IEnumerable<ExpressPack>> GetOwnedPacksAsync(IUser user)
+        {
+            try
+            {
+                var packsResponse = await _expressApiService.GetOwnedPacksAsync(user.UserName);
+                if (!packsResponse.Success || packsResponse.Data is null)
+                {
+                    throw new Exception("Failed to get owned packs");
+                }
+                return packsResponse.Data;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return Enumerable.Empty<ExpressPack>();
+        }
     }
 }

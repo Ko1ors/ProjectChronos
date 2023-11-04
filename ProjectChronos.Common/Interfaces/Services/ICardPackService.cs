@@ -21,5 +21,7 @@ namespace ProjectChronos.Common.Interfaces.Services
         int GetPacksRemaining(CardPackType type);
 
         Task<ExpressPackContent> GetPackContentAsync(CardPackType type);
+
+        Task<IEnumerable<ExpressPack>> GetOwnedPacksAsync(IUser user);
     }
 }

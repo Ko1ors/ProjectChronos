@@ -42,5 +42,14 @@ namespace ProjectChronos.Controllers
         {
             return Ok(await _cardPackService.GetPackContentAsync(type));
         }
+
+        // Get Owned Packs
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ExpressPack>>> GetOwnedPacks()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(await _cardPackService.GetOwnedPacksAsync(currentUser));
+        }
     }
 }
