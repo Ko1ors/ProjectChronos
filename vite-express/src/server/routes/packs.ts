@@ -132,4 +132,11 @@ router.post('/open', async (req, res) => {
     res.send(result);
 });
 
+// Get pack content
+router.get('/content/:tokenId', async (req, res) => {
+    const contract = await getPacksContractAsync();
+    const content = await contract.getPackContents(req.params.tokenId);
+    res.send(content);
+});
+
 export default router;
