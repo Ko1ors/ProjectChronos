@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectChronos.Common.Entities;
+using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Entities;
 using System.Reflection;
 
@@ -17,6 +18,10 @@ namespace ProjectChronos.DB
         public DbSet<DeckCard> DeckCards { get; set; }
 
         public DbSet<UserDeck> UserDecks { get; set; }
+
+        public DbSet<Opponent> Opponents { get; set; }
+
+        public DbSet<OpponentDeck> OpponentDecks { get; set; }
 
         public ApplicationDbContext()
         {
@@ -48,6 +53,13 @@ namespace ProjectChronos.DB
             modelBuilder.Entity<UserDeck>()
                 .HasMany(ud => ud.DeckCards as ICollection<DeckCard>)
                 .WithOne(dc => dc.UserDeck as UserDeck);
+
+            modelBuilder.Entity<Opponent>()
+                .HasOne(o => o.OpponentDeck as OpponentDeck)
+                .WithOne(od => od.Opponent as Opponent);
+
+            modelBuilder.Entity<Opponent>()
+                .HasOne(o => o.User as User);
         }
 
         // For debug purposes
