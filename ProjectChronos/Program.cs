@@ -1,11 +1,11 @@
 using ProjectChronos.DB;
 using ProjectChronos.Entities;
-using ProjectChronos.Interfaces.Services;
 using ProjectChronos.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting;
 using System.Net;
+using ProjectChronos.Common.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,12 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IExpressApiService, ExpressApiService>();
 builder.Services.AddScoped<IPolygonService, PolygonService>();
+builder.Services.AddScoped<ICardPackService, CardPackService>();
+builder.Services.AddScoped<ICardDeckService, CardDeckService>();
+
+builder.Services.AddHostedService<PackCreationHostedService>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -79,7 +84,6 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.EnsureCreated();
     db.Database.Migrate();
 }
 
@@ -91,6 +95,10 @@ using (var scope = app.Services.CreateScope())
     {
         await roleManager.CreateAsync(new IdentityRole("Administrator"));
     }
+
+    // Ensure welcome pack template exists
+    var packService = scope.ServiceProvider.GetService<ICardPackService>();
+    packService.EnsureWelcomePackTemplateExists();
 }
 
 

@@ -1,5 +1,5 @@
 ﻿using ProjectChronos.Entities;
-using ProjectChronos.Interfaces.Services;
+using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

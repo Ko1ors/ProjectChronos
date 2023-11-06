@@ -10,8 +10,15 @@ const router = express.Router();
 // Get all Packs
 router.get('/', async (req, res) => {
     const contract = await getPacksContractAsync();
-    const nfts = await contract.getAll();
-    res.send(nfts);
+    const packs = await contract.getAll();
+    res.send(packs);
+});
+
+// Get Owned by address Packs
+router.get('/owned/:address', async (req, res) => {
+    const contract = await getPacksContractAsync();
+    const packs = await contract.getOwned(req.params.address);
+    res.send(packs);
 });
 
 interface PackReward {
@@ -28,7 +35,7 @@ const validatePackRewards = (rewards: any): rewards is PackReward[] => {
 }
 
 const validatePackCreation = (req: Request, res: Response) => {
-    const { name, description, image, rewards, rewardsPerPack } = req.body;
+    const { name, description, image, internalId, rewards, rewardsPerPack } = req.body;
 
     if (!name)
         return  {success: false, result: "Name is required"}
@@ -44,6 +51,7 @@ const validatePackCreation = (req: Request, res: Response) => {
             name: name,
             description: description,
             image: image,
+            internalId: internalId,
         },
         // ERC20 rewards to be included in the pack
         // erc20Rewards: [
