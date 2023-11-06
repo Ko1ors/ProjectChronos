@@ -70,10 +70,7 @@ const signMessageAsync = async () => {
       params: [msg, accounts.value[0]],
     });
     await loginAsync(accounts.value[0], sign.value, true);
-<<<<<<< HEAD
     window.open("/ProfileInfo", "_self");
-=======
->>>>>>> 11af2ddaac86eb6f433efc0a129729af9e80f8fd
   }
   else {
     responseInfo = messageResponse.message;
@@ -92,13 +89,6 @@ const signMessageAsync = async () => {
     </Button>
     <p v-if="isMetamaskConnected && networkVersion != mumbaiId">Please switch to Polygon Mumbai Testnet</p>
     <p v-if="responseInfo">Error in response: {{ responseInfo }}</p>
-<<<<<<< HEAD
-    <div v-if="!responseInfo && isMetamaskConnected && networkVersion === mumbaiId">
-      <router-link to="/ProfileInfo" target="_blank"></router-link>
-    </div>
-
-=======
->>>>>>> 11af2ddaac86eb6f433efc0a129729af9e80f8fd
   </div>
 </template>
 
