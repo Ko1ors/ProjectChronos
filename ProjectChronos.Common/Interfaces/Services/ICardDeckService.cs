@@ -6,6 +6,9 @@ namespace ProjectChronos.Common.Interfaces.Services
 {
     public interface ICardDeckService
     {
+        UserDeck GetActiveUserDeck(IUser user);
+
+        IEnumerable<UserDeck> GetAllUserDecks(IUser user);
 
         Task<bool> CreateCardDeckAsync(IUser user, IEnumerable<IDeckCard> cards, bool active = false);
 

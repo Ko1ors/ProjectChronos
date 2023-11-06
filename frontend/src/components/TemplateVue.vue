@@ -17,6 +17,7 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
+<<<<<<< HEAD
                     <router-link class="nav-link" to="/AboutChronos">About Chronos
                     </router-link>
                 </li>
@@ -24,6 +25,12 @@
                     <router-link class="nav-link" to="/Decks">Decks
                     </router-link>
                 </li>
+=======
+
+                    <router-link class="nav-link" to="/AboutChronos">About Chronos
+                    </router-link>
+                </li>
+>>>>>>> 11af2ddaac86eb6f433efc0a129729af9e80f8fd
             </ul>
         </div>
     </nav>

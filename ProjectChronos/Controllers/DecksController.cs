@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Entities;
+using ProjectChronos.Extensions;
 using ProjectChronos.Models.Requests;
 
 namespace ProjectChronos.Controllers
@@ -22,6 +23,24 @@ namespace ProjectChronos.Controllers
             _userManager = userManager;
             _cardDeckService = cardDeckService;
             _memoryCache = memoryCache;
+        }
+
+        // Get active deck
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetActiveDeck()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(_cardDeckService.GetActiveUserDeck(currentUser).ToDto());
+        }
+
+        // Get all card decks
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllCardDecks()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(_cardDeckService.GetAllUserDecks(currentUser).ToDto());
         }
 
 

@@ -23,6 +23,7 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 builder.Services.AddScoped<IExpressApiService, ExpressApiService>();
 builder.Services.AddScoped<IPolygonService, PolygonService>();
 builder.Services.AddScoped<ICardPackService, CardPackService>();
+builder.Services.AddScoped<ICardDeckService, CardDeckService>();
 
 builder.Services.AddHostedService<PackCreationHostedService>();
 
