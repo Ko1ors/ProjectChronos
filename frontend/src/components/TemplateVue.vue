@@ -20,6 +20,10 @@
                     <router-link class="nav-link" to="/AboutChronos">About Chronos
                     </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/DecksVue">Decks
+                    </router-link>
+                </li>
             </ul>
         </div>
     </nav>

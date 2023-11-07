@@ -24,7 +24,7 @@ const router = createRouter({
     { path: '/AuthorizationPage', component: AuthorizationPage },
     { path: '/ProfileInfo', component: ProfileInfo },
     { path: '/AboutChronos', component: AboutChronos },
-    { path: '/Decks', component: DecksVue }
+    { path: '/DecksVue', component: DecksVue }
   ]
 })
 
