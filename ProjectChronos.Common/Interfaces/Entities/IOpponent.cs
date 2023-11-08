@@ -13,10 +13,10 @@
         // User can be null if the opponent is a bot
         public IUser? User { get; set; }
 
-        public IUser? OpponentUser { get; set; }
-
         public int OpponentDeckId { get; set; }
 
         public IOpponentDeck OpponentDeck { get; set; }
+
+        public ICollection<IUser> OpponentUsers { get; set; }
     }
 }

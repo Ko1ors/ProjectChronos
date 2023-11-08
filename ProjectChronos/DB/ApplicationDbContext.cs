@@ -62,7 +62,7 @@ namespace ProjectChronos.DB
                 .HasOne(o => o.User as User);
 
             modelBuilder.Entity<Opponent>()
-                .HasOne(o => o.OpponentUser as User)
+                .HasMany(o => o.OpponentUsers as ICollection<User>)
                 .WithMany(u => u.Opponents as ICollection<Opponent>);
         }
 
