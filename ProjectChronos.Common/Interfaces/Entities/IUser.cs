@@ -7,5 +7,7 @@
         public string UserName { get; set; }
 
         public ICollection<IUserDeck> UserDecks { get; set; }
+
+        public ICollection<IOpponent> Opponents { get; set; }
     }
 }

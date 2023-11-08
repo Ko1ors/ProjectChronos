@@ -60,6 +60,10 @@ namespace ProjectChronos.DB
 
             modelBuilder.Entity<Opponent>()
                 .HasOne(o => o.User as User);
+
+            modelBuilder.Entity<Opponent>()
+                .HasOne(o => o.OpponentUser as User)
+                .WithMany(u => u.Opponents as ICollection<Opponent>);
         }
 
         // For debug purposes
