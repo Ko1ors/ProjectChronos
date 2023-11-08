@@ -9,6 +9,8 @@ namespace ProjectChronos.Common.Interfaces.Services
     {
         Task<ExpressResponse<T>> SendRequestAsync<T>(string url, string method, object body = null, bool retry = true);
 
+        Task<ExpressResponse<IEnumerable<ExpressNft>>> GetAllNftsAsync(bool retry = true);
+
         Task<ExpressResponse<IEnumerable<ExpressNft>>> GetOwnedNftsAsync(string address, bool retry = true);
 
         Task<ExpressResponse<IEnumerable<ExpressPack>>> GetOwnedPacksAsync(string address, bool retry = true);

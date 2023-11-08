@@ -152,6 +152,12 @@ namespace ProjectChronos.Services
             return false;
         }
 
+        public Task<ExpressResponse<IEnumerable<ExpressNft>>> GetAllNftsAsync(bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/nft/";
+            return SendRequestAsync<IEnumerable<ExpressNft>>(url, "GET", retry: retry);
+        }
+
         public Task<ExpressResponse<IEnumerable<ExpressNft>>> GetOwnedNftsAsync(string address, bool retry = true)
         {
             var url = $"{ExpressApiUrl}/nft/owned/{address}";
