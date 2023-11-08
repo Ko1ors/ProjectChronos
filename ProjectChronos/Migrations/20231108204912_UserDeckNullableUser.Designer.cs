@@ -12,8 +12,8 @@ using ProjectChronos.DB;
 namespace ProjectChronos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231105202510_OpponentsAndOpponentDecks")]
-    partial class OpponentsAndOpponentDecks
+    [Migration("20231108204912_UserDeckNullableUser")]
+    partial class UserDeckNullableUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -341,7 +341,6 @@ namespace ProjectChronos.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -418,6 +417,21 @@ namespace ProjectChronos.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("UserOpponent", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OpponentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "OpponentId");
+
+                    b.HasIndex("OpponentId");
+
+                    b.ToTable("UserOpponent");
                 });
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.OpponentDeck", b =>
@@ -538,11 +552,24 @@ namespace ProjectChronos.Migrations
                 {
                     b.HasOne("ProjectChronos.Entities.User", "User")
                         .WithMany("UserDecks")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserOpponent", b =>
+                {
+                    b.HasOne("ProjectChronos.Common.Entities.Opponent", null)
+                        .WithMany()
+                        .HasForeignKey("OpponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("ProjectChronos.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.CardPackTemplate", b =>

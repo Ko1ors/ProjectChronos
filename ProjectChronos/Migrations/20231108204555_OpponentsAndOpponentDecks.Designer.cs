@@ -12,8 +12,8 @@ using ProjectChronos.DB;
 namespace ProjectChronos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231108195612_AddedOpponentUsers")]
-    partial class AddedOpponentUsers
+    [Migration("20231108204555_OpponentsAndOpponentDecks")]
+    partial class OpponentsAndOpponentDecks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,21 +175,6 @@ namespace ProjectChronos.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("OpponentUser", b =>
-                {
-                    b.Property<string>("OpponentUsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("OpponentsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OpponentUsersId", "OpponentsId");
-
-                    b.HasIndex("OpponentsId");
-
-                    b.ToTable("OpponentUser");
                 });
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.CardPackRewardTemplate", b =>
@@ -435,6 +420,21 @@ namespace ProjectChronos.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("UserOpponent", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OpponentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "OpponentId");
+
+                    b.HasIndex("OpponentId");
+
+                    b.ToTable("UserOpponent");
+                });
+
             modelBuilder.Entity("ProjectChronos.Common.Entities.OpponentDeck", b =>
                 {
                     b.HasBaseType("ProjectChronos.Common.Entities.UserDeck");
@@ -510,21 +510,6 @@ namespace ProjectChronos.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OpponentUser", b =>
-                {
-                    b.HasOne("ProjectChronos.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OpponentUsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectChronos.Common.Entities.Opponent", null)
-                        .WithMany()
-                        .HasForeignKey("OpponentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ProjectChronos.Common.Entities.CreatedPacks", b =>
                 {
                     b.HasOne("ProjectChronos.Common.Entities.CardPackTemplate", "CardPackTemplate")
@@ -573,6 +558,21 @@ namespace ProjectChronos.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserOpponent", b =>
+                {
+                    b.HasOne("ProjectChronos.Common.Entities.Opponent", null)
+                        .WithMany()
+                        .HasForeignKey("OpponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectChronos.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.CardPackTemplate", b =>

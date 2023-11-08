@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Azure;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
@@ -63,7 +64,23 @@ namespace ProjectChronos.DB
 
             modelBuilder.Entity<Opponent>()
                 .HasMany(o => o.OpponentUsers as ICollection<User>)
-                .WithMany(u => u.Opponents as ICollection<Opponent>);
+                .WithMany(u => u.Opponents as ICollection<Opponent>)
+                .UsingEntity(
+            "UserOpponent",
+            l => l
+                .HasOne(typeof(User))
+                .WithMany()
+                .HasForeignKey("UserId")
+                .HasPrincipalKey(nameof(User.Id))
+                .OnDelete(DeleteBehavior.Restrict),
+            r => r
+                .HasOne(typeof(Opponent))
+                .WithMany()
+                .HasForeignKey("OpponentId")
+                .HasPrincipalKey(nameof(Opponent.Id))
+                .OnDelete(DeleteBehavior.Cascade),
+            j => j.HasKey("UserId", "OpponentId")
+        );
         }
 
         // For debug purposes

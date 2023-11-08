@@ -46,6 +46,30 @@ namespace ProjectChronos.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserOpponent",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OpponentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserOpponent", x => new { x.UserId, x.OpponentId });
+                    table.ForeignKey(
+                        name: "FK_UserOpponent_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserOpponent_Opponents_OpponentId",
+                        column: x => x.OpponentId,
+                        principalTable: "Opponents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Opponents_OpponentDeckId",
                 table: "Opponents",
@@ -56,11 +80,19 @@ namespace ProjectChronos.Migrations
                 name: "IX_Opponents_UserId",
                 table: "Opponents",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserOpponent_OpponentId",
+                table: "UserOpponent",
+                column: "OpponentId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "UserOpponent");
+
             migrationBuilder.DropTable(
                 name: "Opponents");
 
