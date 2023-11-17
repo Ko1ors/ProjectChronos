@@ -1,3 +1,6 @@
+import type UserDeck from '@/models/UserDeck'
+import type DeckCard from '@/models/DeckCard'
+
 export const apiUrl = import.meta.env.VITE_SERVICE_API_URL
 
 export interface Response<T> {
@@ -22,6 +25,35 @@ export const loginAsync = async function (
   rememberMe: boolean
 ): Promise<Response<string>> {
   const response = postAsync<string>(`${apiUrl}/Users/Login`, { address, signature, rememberMe })
+  return response
+}
+
+export const getActiveDeckAsync = async function (): Promise<Response<UserDeck>> {
+  const response = getAsync<UserDeck>(`${apiUrl}/Decks/GetActiveDeck`)
+  return response
+}
+
+export const createDeckAsync = async function (
+  cards: DeckCard[],
+  active: boolean
+): Promise<Response<string>> {
+  const response = postAsync<string>(`${apiUrl}/Decks/CreateCardDeck`, { cards, active })
+  return response
+}
+
+export const deleteDeckAsync = async function (deckId: number): Promise<Response<string>> {
+  const response = deleteAsync<string>(`${apiUrl}/Decks/DeleteCardDeck?deckId=${deckId}`, {
+    deckId
+  })
+  return response
+}
+
+export const updateDeckAsync = async function (
+  deckId: number,
+  cards: DeckCard[],
+  active: boolean
+): Promise<Response<string>> {
+  const response = putAsync<string>(`${apiUrl}/Decks/UpdateCardDeck`, { deckId, cards, active })
   return response
 }
 
