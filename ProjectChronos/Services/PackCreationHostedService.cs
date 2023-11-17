@@ -21,7 +21,7 @@ namespace ProjectChronos.Services
         {
 
             _timer = new Timer(Execute, null, TimeSpan.Zero,
-                TimeSpan.FromMinutes(30));
+                TimeSpan.FromMinutes(5));
 
             return Task.CompletedTask;
         }

@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Common.Models.ExpressApi;
-using System.Net;
 using System.Text;
 
 namespace ProjectChronos.Services
@@ -182,6 +180,25 @@ namespace ProjectChronos.Services
             var url = $"{ExpressApiUrl}/packs/create";
             var body = new CreatePackRequestBody(packTemplate, internalId);
             return SendRequestAsync(url, "POST", body, retry: retry);
+        }
+
+        public Task<bool> TransferPackAsync(int packId, string address, int amount, bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/packs/transfer";
+            var body = new
+            {
+                tokenId = packId,
+                address,
+                amount
+            };
+            return SendRequestAsync(url, "POST", body, retry: retry);
+        }
+
+        public Task<ExpressResponse<ExpressPackContent>> GetPackContentAsync(int packId, bool retry = true)
+        {
+            var url = $"{ExpressApiUrl}/packs/content/{packId}";
+
+            return SendRequestAsync<ExpressPackContent>(url, "GET", retry: retry);
         }
     }
 }

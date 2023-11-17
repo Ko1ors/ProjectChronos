@@ -2,7 +2,9 @@
 using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
+using ProjectChronos.Common.Models;
 using ProjectChronos.Common.Models.Enums;
+using ProjectChronos.Common.Models.ExpressApi;
 using ProjectChronos.DB;
 
 namespace ProjectChronos.Services
@@ -74,7 +76,7 @@ namespace ProjectChronos.Services
                 .Include(cpt => cpt.RewardTemplates)
                 .FirstOrDefault(x => x.Id == cardPackTemplateId);
 
-            if(packTemplate == null)
+            if (packTemplate == null)
             {
                 throw new Exception($"Card pack template not found for id {cardPackTemplateId}");
             }
@@ -88,7 +90,7 @@ namespace ProjectChronos.Services
                 .Include(cpt => cpt.RewardTemplates)
                 .FirstOrDefault(x => x.Type == type);
 
-            if(packTemplate == null)
+            if (packTemplate == null)
             {
                 throw new Exception($"Card pack template not found for type {type}");
             }
@@ -108,17 +110,17 @@ namespace ProjectChronos.Services
             {
                 throw new Exception("Card pack template is null");
             }
-            if(packTemplate.RewardTemplates == null || packTemplate.RewardTemplates.Count == 0)
+            if (packTemplate.RewardTemplates == null || packTemplate.RewardTemplates.Count == 0)
             {
                 throw new Exception("Card pack template has no rewards");
             }
 
             var rewards = packTemplate.RewardTemplates.ToList();
-            
+
 
             // Check if NFTs exist for each reward
             var ownedNftsResponse = await _expressApiService.GetOwnedNftsAsync(OwnerAddress);
-            if(!ownedNftsResponse.Success || ownedNftsResponse.Data is null)
+            if (!ownedNftsResponse.Success || ownedNftsResponse.Data is null)
             {
                 throw new Exception("Failed to get owned NFTs");
             }
@@ -128,7 +130,7 @@ namespace ProjectChronos.Services
             foreach (var reward in rewards)
             {
                 var ownedNft = ownedNftsResponse.Data.FirstOrDefault(nft => nft.Metadata.Id == reward.TokenId.ToString());
-                if(ownedNft == null)
+                if (ownedNft == null)
                 {
                     rewardsToCreate.Add(new RewardsToCreate()
                     {
@@ -136,7 +138,7 @@ namespace ProjectChronos.Services
                         Quantity = reward.TotalRewards
                     });
                 }
-                else if(int.Parse(ownedNft.QuantityOwned) < reward.TotalRewards)
+                else if (int.Parse(ownedNft.QuantityOwned) < reward.TotalRewards)
                 {
                     rewardsToCreate.Add(new RewardsToCreate()
                     {
@@ -163,7 +165,7 @@ namespace ProjectChronos.Services
                     try
                     {
                         var createNftResponse = await _expressApiService.ClaimNftsAsync(token, quantity);
-                        if(!createNftResponse)
+                        if (!createNftResponse)
                         {
                             continue;
                         }
@@ -176,7 +178,7 @@ namespace ProjectChronos.Services
                         }
                         ownedNfts = ownedNftsResponse.Data.ToList();
 
-                        if(createNftResponse && ownedNfts.Any(nft => nft.Metadata.Id == token.ToString() && int.Parse(nft.QuantityOwned) >= quantity))
+                        if (createNftResponse && ownedNfts.Any(nft => nft.Metadata.Id == token.ToString() && int.Parse(nft.QuantityOwned) >= quantity))
                         {
                             nftCreated = true;
                             break;
@@ -194,7 +196,7 @@ namespace ProjectChronos.Services
                     Thread.Sleep(500 * currentRetries);
                 }
 
-                if(!nftCreated)
+                if (!nftCreated)
                 {
                     throw new Exception($"Failed to create NFTs for token {token} and quantity {quantity} after multiple retries");
                 }
@@ -204,7 +206,7 @@ namespace ProjectChronos.Services
 
             var internalId = Guid.NewGuid().ToString();
             var packsCreated = await _expressApiService.CreatePacksAsync(packTemplate, internalId);
-            if(!packsCreated)
+            if (!packsCreated)
             {
                 throw new Exception("Failed to create packs");
             }
@@ -219,7 +221,7 @@ namespace ProjectChronos.Services
 
             var ownedPacks = ownedPacksResponse.Data.ToList();
             var createdPack = ownedPacks.FirstOrDefault(pack => pack.Metadata.InternalId == internalId);
-            if(createdPack == null)
+            if (createdPack == null)
             {
                 throw new Exception($"Failed to find created pack with internal id {internalId}");
             }
@@ -230,6 +232,7 @@ namespace ProjectChronos.Services
                 CardPackTemplateId = packTemplate.Id,
                 QuantityRemaining = int.Parse(createdPack.QuantityOwned),
                 Quantity = int.Parse(createdPack.QuantityOwned),
+                InternalId = internalId,
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -250,7 +253,7 @@ namespace ProjectChronos.Services
 
                 if (welcomePackTemplate == null)
                 {
-                       // Create welcome pack template
+                    // Create welcome pack template
                     _dbContext.CardPackTemplates.Add(_welcomePackTemplate);
                     _dbContext.SaveChanges();
                     return true;
@@ -260,7 +263,7 @@ namespace ProjectChronos.Services
                 var rewards = welcomePackTemplate.RewardTemplates.ToList();
                 var rewardsMatch = rewards.Count == _welcomePackTemplate.RewardTemplates.Count;
 
-                if(rewardsMatch)
+                if (rewardsMatch)
                 {
                     foreach (var reward in rewards)
                     {
@@ -273,7 +276,7 @@ namespace ProjectChronos.Services
                     }
                 }
 
-                if(!rewardsMatch)
+                if (!rewardsMatch)
                 {
                     // Update welcome pack template rewards
                     welcomePackTemplate.RewardTemplates = _welcomePackTemplate.RewardTemplates;
@@ -288,7 +291,7 @@ namespace ProjectChronos.Services
                     welcomePackTemplate.ImageUrl == _welcomePackTemplate.ImageUrl &&
                     welcomePackTemplate.RewardsPerPack == _welcomePackTemplate.RewardsPerPack;
 
-                if(!propertiesMatch)
+                if (!propertiesMatch)
                 {
                     // Update welcome pack template
                     welcomePackTemplate.Name = _welcomePackTemplate.Name;
@@ -314,10 +317,128 @@ namespace ProjectChronos.Services
 
         public int GetPacksRemaining(CardPackType type)
         {
-           return _dbContext.CreatedPacks
-                .Where(cp => cp.CardPackTemplate.Type == type)
-                .Select(cp => cp.QuantityRemaining)
-                .Sum();
+            return _dbContext.CreatedPacks
+                 .Where(cp => cp.CardPackTemplate.Type == type)
+                 .Select(cp => cp.QuantityRemaining)
+                 .Sum();
+        }
+
+        public async Task<BaseServiceResult> ClaimPackAsync(IUser user, CardPackType type)
+        {
+            try
+            {
+                if (GetPacksRemaining(type) <= 0)
+                {
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "No packs remaining. Please try again later."
+                    };
+                };
+
+                // TODO: Additionally validate that user has not claimed a pack of this type in the last 24 hours
+
+                var createdPack = _dbContext.CreatedPacks
+                    .Include(cp => cp.CardPackTemplate)
+                    .FirstOrDefault(cp => cp.CardPackTemplate.Type == type && cp.QuantityRemaining > 0);
+
+                var ownedPacksResponse = await _expressApiService.GetOwnedPacksAsync(OwnerAddress);
+                if (!ownedPacksResponse.Success || ownedPacksResponse.Data is null)
+                {
+                    throw new Exception("Failed to get owned packs");
+                }
+
+                var pack = ownedPacksResponse.Data.FirstOrDefault(p => p.Metadata.InternalId == createdPack.InternalId);
+                // If pack quantity owned is 0, then it's not longer available
+                // Set quantity remaining to 0 and return
+                if (pack is null || pack.QuantityOwned == "0")
+                {
+                    createdPack.QuantityRemaining = 0;
+                    _dbContext.SaveChanges();
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "No packs remaining. Please try again later."
+                    };
+                }
+
+                var transferResult = await _expressApiService.TransferPackAsync(int.Parse(pack.Metadata.Id), user.UserName, 1, true);
+                if (!transferResult)
+                {
+                    return new BaseServiceResult()
+                    {
+                        Success = false,
+                        Message = "Failed to claim pack. Please try again later."
+                    };
+                }
+
+                createdPack.QuantityRemaining--;
+
+                _dbContext.SaveChanges();
+
+                return new BaseServiceResult()
+                {
+                    Success = true,
+                    Message = "Pack claimed successfully"
+                };
+            }
+            catch (Exception e)
+            {
+
+            }
+            return new BaseServiceResult()
+            {
+                Success = false,
+                Message = "Failed to claim pack"
+            };
+        }
+
+        public async Task<ExpressPackContent> GetPackContentAsync(CardPackType type)
+        {
+            try
+            {
+                var createdPack = _dbContext.CreatedPacks
+                    .Include(cp => cp.CardPackTemplate)
+                    .FirstOrDefault(cp => cp.CardPackTemplate.Type == type && cp.QuantityRemaining > 0);
+
+                var ownedPacksResponse = await _expressApiService.GetOwnedPacksAsync(OwnerAddress);
+                if (!ownedPacksResponse.Success || ownedPacksResponse.Data is null)
+                {
+                    throw new Exception("Failed to get owned packs");
+                }
+
+                var pack = ownedPacksResponse.Data.FirstOrDefault(p => p.Metadata.InternalId == createdPack.InternalId);
+                if(pack is null)
+                {
+                    throw new Exception("Failed to find pack");
+                }
+
+                var packContentResponse = await _expressApiService.GetPackContentAsync(int.Parse(pack.Metadata.Id));
+                return packContentResponse.Data;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return default;
+        }
+
+        public async Task<IEnumerable<ExpressPack>> GetOwnedPacksAsync(IUser user)
+        {
+            try
+            {
+                var packsResponse = await _expressApiService.GetOwnedPacksAsync(user.UserName);
+                if (!packsResponse.Success || packsResponse.Data is null)
+                {
+                    throw new Exception("Failed to get owned packs");
+                }
+                return packsResponse.Data;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return Enumerable.Empty<ExpressPack>();
         }
     }
 }
