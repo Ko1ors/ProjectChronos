@@ -6,6 +6,7 @@
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <AboutPage/>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
@@ -38,6 +39,10 @@
     </div>
     <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
 </template>
+
+<script setup lang="ts">
+import AboutPage from './AboutPage.vue'
+</script>
 
 <style scoped lang="scss">
 .navbar-brand {
