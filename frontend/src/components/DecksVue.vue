@@ -14,12 +14,12 @@ import { ThirdwebSDK, type Pack, type NFT } from "@thirdweb-dev/sdk";
 import range from "../resources/ranged.png"
 import melee from "../resources/melee.png"
 import { createDeckAsync, deleteDeckAsync, getActiveDeckAsync, updateDeckAsync } from '../api/api';
+import { isTouchDevice } from '../shared/MobileHelper';
 
 //let packs = ref<NFT[]>([]);
 //let tx: Transaction;
 let cards = ref<Card[]>([]);
 let activeDeck = ref<UserDeck>();
-let noDeckVisible = ref(false);
 let deleteDeckVisible = ref(false);
 let updateDeckVisible = ref(false);
 let isDeck = ref(true);
@@ -64,8 +64,8 @@ const updateDeck = async () => {
 }
 
 const getActiveDeck = async () => {
-    if ((await getActiveDeckAsync()).data !== null) {
-        activeDeck.value = (await getActiveDeckAsync()).data!;
+    activeDeck.value = (await getActiveDeckAsync()).data!;
+    if (activeDeck.value) {
         cards.value.forEach((element1) => {
             cards.value.forEach((element2) => {
                 if (element1.metadata.id == element2.metadata.id && element1.list != element2.list) {
@@ -91,22 +91,18 @@ const getActiveDeck = async () => {
             })
         })
     }
-    else {
-        noDeckVisible.value = true;
-    }
 }
 
 const deleteDeck = async () => {
-    if ((await getActiveDeckAsync()).data !== null) {
+    activeDeck.value = (await getActiveDeckAsync()).data!;
+    if (activeDeck.value) {
         deleteDeckVisible.value = false;
-        const id = (await getActiveDeckAsync()).data!.id
-        await deleteDeckAsync(id);
+        await deleteDeckAsync(activeDeck.value.id);
         isDeck.value = false
         buttonLable.value = "Create a deck"
     }
     else {
         deleteDeckVisible.value = false
-        noDeckVisible.value = true;
         isDeck.value = false
     }
 }
@@ -152,6 +148,34 @@ const startDrag = (event: DragEvent | null, item: NFT) => {
     event!.dataTransfer!.setData("itemID", item.metadata.id)
 }
 
+const onCardTouch = (item: Card, listId: number) => {
+    if (isTouchDevice()) {
+        const isInAnotherList = cards.value.find((element) => element.metadata.id == item.metadata.id && element.list == listId)
+        let item2;
+        if (parseInt(item!.quantityOwned!) > 1) {
+            item!.quantityOwned = (parseInt(item!.quantityOwned!) - 1).toString();
+            if (isInAnotherList === undefined) {
+                item2 = Object.assign({}, item)
+                item2.quantityOwned = "1"
+                item2.list = listId
+                cards.value.push(item2)
+            }
+            else {
+                isInAnotherList!.quantityOwned = (parseInt(isInAnotherList!.quantityOwned!) + 1).toString();
+            }
+        }
+        else {
+            if (isInAnotherList === undefined) {
+                item!.list = listId
+            }
+            else {
+                isInAnotherList.quantityOwned = (parseInt(isInAnotherList!.quantityOwned!) + 1).toString();
+                cards.value.splice(cards.value.indexOf(item!), 1);
+            }
+        }
+    }
+}
+
 const onDrop = (event: DragEvent, listId: number) => {
     const itemID = event.dataTransfer?.getData("itemID")
     const item = cards.value.find((item) => item.metadata.id == itemID && item.list != listId)
@@ -195,14 +219,14 @@ onBeforeMount(async () => {
     const address = await wallet.getAddress();
 
     //const contract = await sdk.getContract(import.meta.env.VITE_PACKS_CONTRACT, "pack");
-    const contractCards = await sdk.getContract(import.meta.env.VITE_CARDS_CONTRACT);
-
-
-
+    try {
+        const contractCards = await sdk.getContract(import.meta.env.VITE_CARDS_CONTRACT);
+        cards.value = await contractCards.erc1155.getOwned(address) as Card[];
+    }
+    catch (e) {
+        location.reload()
+    }
     //packs.value = await contract.getOwned(address);
-
-    cards.value = await contractCards.erc1155.getOwned(address) as Card[];
-
     cards.value = cards.value.map((element) => { element.list = 1; return element })
 
     if ((await getActiveDeckAsync()).data !== null) {
@@ -212,23 +236,12 @@ onBeforeMount(async () => {
         isDeck.value = false;
         buttonLable.value = "Create a deck"
     }
-    console.log(cards.value);
-
 })
 
 </script>
 
 <template>
     <TemplateVue>
-        <Dialog :visible="noDeckVisible" modal header="Error" :style="{ width: '50rem' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <p class="m-0">
-                You don't have an active deck!
-            </p>
-            <template #footer>
-                <Button label="Ok" icon="pi pi-check" @click="noDeckVisible = false" autofocus />
-            </template>
-        </Dialog>
         <Dialog :visible="deleteDeckVisible" modal header="Message" :style="{ width: '50rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <p class="m-0">
@@ -257,7 +270,7 @@ onBeforeMount(async () => {
                         <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto">
                             <div class="col" v-for="card in getList(1)" :key="card.metadata.id">
                                 <div class="card" draggable="true" @dragstart="startDrag($event, card)"
-                                    :class="getCardRarity(card.metadata.rarity as string)"
+                                    @click="onCardTouch(card, 2)" :class="getCardRarity(card.metadata.rarity as string)"
                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
                                     <div class="header">
                                         <div class="name">{{ card.metadata.name }}</div>
@@ -300,7 +313,7 @@ onBeforeMount(async () => {
                         <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto">
                             <div class="col" v-for="card in getList(2)" :key="card.metadata.id">
                                 <div class="card" draggable="true" @dragstart="startDrag($event, card)"
-                                    :class="getCardRarity(card.metadata.rarity as string)"
+                                    @click="onCardTouch(card, 1)" :class="getCardRarity(card.metadata.rarity as string)"
                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
                                     <div class="header">
                                         <div class="name">{{ card.metadata.name }}</div>

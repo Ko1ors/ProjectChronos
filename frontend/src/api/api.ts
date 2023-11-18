@@ -28,7 +28,7 @@ export const loginAsync = async function (
   return response
 }
 
-export const getActiveDeckAsync = async function (): Promise<Response<UserDeck>> {
+export const getActiveDeckAsync = async function (): Promise<Response<UserDeck | null>> {
   const response = getAsync<UserDeck>(`${apiUrl}/Decks/GetActiveDeck`)
   return response
 }
@@ -89,6 +89,9 @@ export const getAsync = async function <T>(url: string, options?: RequestInit) {
     }
     console.error(errorResponse)
     return errorResponse
+  }
+  if (response.status == 204) {
+    return { success: true, message: '', data: null }
   }
   return { success: true, message: '', data: (await getContentAsync(response)) as T }
 }
