@@ -172,7 +172,7 @@ namespace ProjectChronos.Services
             return false;
         }
 
-        public UserDeck GetActiveUserDeck(IUser user)
+        public UserDeck? GetActiveUserDeck(IUser user)
         {
             try
             {

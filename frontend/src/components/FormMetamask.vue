@@ -70,6 +70,7 @@ const signMessageAsync = async () => {
       params: [msg, accounts.value[0]],
     });
     await loginAsync(accounts.value[0], sign.value, true);
+    window.open("/ProfileInfo", "_self");
   }
   else {
     responseInfo = messageResponse.message;

@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 
 import TemplateVue from './TemplateVue.vue'
@@ -11,4 +10,5 @@ import TemplateVue from './TemplateVue.vue'
 </template>
 
 <style scoped lang="scss"></style>
+
 
