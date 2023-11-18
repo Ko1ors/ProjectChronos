@@ -14,7 +14,7 @@ namespace ProjectChronos.Services
         private readonly ApplicationDbContext _dbContext;
         private readonly IExpressApiService _expressApiService;
 
-        public const int OpponentsCount = 5;
+        public const int OpponentsCount = 3;
         public const int DeckSize = 12;
 
         public GameSystemService(ApplicationDbContext dbContext, IExpressApiService expressApiService)
@@ -26,7 +26,13 @@ namespace ProjectChronos.Services
         public async Task<IEnumerable<IOpponent>> GetOrCreateUserOpponentsAsync(IUser user)
         {
             // If opponents exist, return them
-            var opponents = _dbContext.Opponents.Include(o => o.OpponentUsers).Where(o => o.OpponentUsers.Any(u => u.Id == user.Id)).ToList();
+            var opponents = _dbContext.Opponents
+                .Include(o => o.OpponentUsers)
+                .Include(o => o.OpponentDeck)
+                .ThenInclude(d => d.DeckCards)
+                .Where(o => o.OpponentUsers.Any(u => u.Id == user.Id))
+                .ToList();
+
             if(opponents.Any())
                 return opponents;
 

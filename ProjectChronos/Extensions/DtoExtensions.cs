@@ -35,5 +35,20 @@ namespace ProjectChronos.Extensions
         {
             return userDecks.Select(ToDto);
         }
+
+        public static OpponentDto ToDto(this IOpponent opponent)
+        {
+            return new OpponentDto
+            {
+                Id = opponent.Id,
+                Name = opponent.Name,
+                OpponentDeck = opponent.OpponentDeck.ToDto()
+            };
+        }
+
+        public static IEnumerable<OpponentDto> ToDto(this IEnumerable<IOpponent> opponents)
+        {
+            return opponents.Select(ToDto);
+        }
     }
 }

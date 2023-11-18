@@ -33,7 +33,12 @@ namespace ProjectChronos.Controllers
         public async Task<IActionResult> GetOpponents()
         {
             var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            return Ok((await _gameSystemService.GetOrCreateUserOpponentsAsync(currentUser)));
+            var opponents = await _gameSystemService.GetOrCreateUserOpponentsAsync(currentUser);
+            if (opponents == null)
+            {
+                return BadRequest();
+            }
+            return Ok(opponents.ToDto());
         }
     }
 }
