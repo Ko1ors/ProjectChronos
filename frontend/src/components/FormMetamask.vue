@@ -46,6 +46,8 @@ const connectMetamask = async () => {
         console.error(err);
       }
     });
+    console.log(accounts.value);
+
 
     // Set the isMetamaskConnected flag to true
     isMetamaskConnected.value = true;

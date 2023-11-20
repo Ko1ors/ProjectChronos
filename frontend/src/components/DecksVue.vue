@@ -10,7 +10,7 @@ import type DeckCard from '../models/DeckCard.ts';
 import type UserDeck from '../models/UserDeck.ts';
 import { MetaMaskWallet } from "@thirdweb-dev/wallets";
 import { Mumbai } from "@thirdweb-dev/chains";
-import { ThirdwebSDK, type Pack, type NFT } from "@thirdweb-dev/sdk";
+import { ThirdwebSDK, type NFT } from "@thirdweb-dev/sdk";
 import range from "../resources/ranged.png"
 import melee from "../resources/melee.png"
 import { createDeckAsync, deleteDeckAsync, getActiveDeckAsync, updateDeckAsync } from '../api/api';
@@ -96,7 +96,7 @@ const getActiveDeck = async () => {
 const deleteDeck = async () => {
     activeDeck.value = (await getActiveDeckAsync()).data!;
     if (activeDeck.value) {
-        deleteDeckVisible.value = false;
+        deleteDeckVisible.value = false
         await deleteDeckAsync(activeDeck.value.id);
         isDeck.value = false
         buttonLable.value = "Create a deck"
@@ -236,6 +236,8 @@ onBeforeMount(async () => {
         isDeck.value = false;
         buttonLable.value = "Create a deck"
     }
+    console.log(cards);
+
 })
 
 </script>
@@ -315,7 +317,7 @@ onBeforeMount(async () => {
                                 <div class="card" draggable="true" @dragstart="startDrag($event, card)"
                                     @click="onCardTouch(card, 1)" :class="getCardRarity(card.metadata.rarity as string)"
                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
-                                    <div class="header">
+                                    <div>
                                         <div class="name">{{ card.metadata.name }}</div>
                                         <div class="count" v-if="(card.quantityOwned as unknown as number) > 1">x{{
                                             card.quantityOwned }}

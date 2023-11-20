@@ -1,5 +1,7 @@
 import type UserDeck from '@/models/UserDeck'
 import type DeckCard from '@/models/DeckCard'
+import type { NFT } from '@thirdweb-dev/sdk'
+import { PackType } from '../models/PackType'
 
 export const apiUrl = import.meta.env.VITE_SERVICE_API_URL
 
@@ -29,7 +31,24 @@ export const loginAsync = async function (
 }
 
 export const getActiveDeckAsync = async function (): Promise<Response<UserDeck | null>> {
-  const response = getAsync<UserDeck>(`${apiUrl}/Decks/GetActiveDeck`)
+  const response = getAsync<UserDeck | null>(`${apiUrl}/Decks/GetActiveDeck`)
+  return response
+}
+
+export const getOwnedPacksAsync = async function (): Promise<Response<NFT[] | null>> {
+  const response = getAsync<NFT[] | null>(`${apiUrl}/Packs/GetOwnedPacks`)
+  return response
+}
+
+export const claimPackAsync = async function (packType: PackType): Promise<Response<boolean>> {
+  const response = postAsync<boolean>(`${apiUrl}/Packs/ClaimPack`, { packType })
+  return response
+}
+
+export const getPackContentAsync = async function (
+  packType: PackType
+): Promise<Response<NFT[] | null>> {
+  const response = getAsync<NFT[] | null>(`${apiUrl}/Packs/GetPackContent?type=${packType}`)
   return response
 }
 

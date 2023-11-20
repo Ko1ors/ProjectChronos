@@ -22,42 +22,42 @@ const packIds = [
 ]
 function init() {
     try {
-    pack = new (window as any).YT.Player('pack', {
-        videoId: packIds[Math.floor(Math.random() * packIds.length)], 
-        loop: true,
-        host: 'https://www.youtube.com',
-        autoplay: 1,
-        events: {
-            onReady: function (e: any) {
-                pack.setVolume(10);
-                e.target.playVideo();
-            },
-            onStateChange: function (e: any) {
-                if (e.data === (window as any).YT.PlayerState.ENDED) {
-                    pack.loadVideoById(packIds[Math.floor(Math.random() * packIds.length)]);
+        pack = new (window as any).YT.Player('pack', {
+            videoId: packIds[Math.floor(Math.random() * packIds.length)],
+            loop: true,
+            host: 'https://www.youtube.com',
+            autoplay: 1,
+            events: {
+                onReady: function (e: any) {
+                    pack.setVolume(10);
+                    e.target.playVideo();
+                },
+                onStateChange: function (e: any) {
+                    if (e.data === (window as any).YT.PlayerState.ENDED) {
+                        pack.loadVideoById(packIds[Math.floor(Math.random() * packIds.length)]);
+                    }
                 }
             }
-        }
-    });
-    } catch (e) {}
+        });
+    } catch (e) { }
 }
 const startPlayer = () => {
     try {
-    if(pack && pack.playVideo)
-        pack.playVideo();
-    } catch (e) {}
+        if (pack && pack.playVideo)
+            pack.playVideo();
+    } catch (e) { }
 }
 onMounted(() => {
     try {
-    let recaptchaScript = document.createElement('script')
-    recaptchaScript.setAttribute('src', 'http://www.youtube.com/player_api')
-    document.head.appendChild(recaptchaScript)
-    setTimeout(() => {
-        init()
-    }, 1000)
-    setInterval(() => {
-        startPlayer()
-    }, 1000)
-} catch (e) {}
+        let recaptchaScript = document.createElement('script')
+        recaptchaScript.setAttribute('src', 'http://www.youtube.com/player_api')
+        document.head.appendChild(recaptchaScript)
+        setTimeout(() => {
+            init()
+        }, 1000)
+        setInterval(() => {
+            startPlayer()
+        }, 1000)
+    } catch (e) { }
 })  
 </script>
