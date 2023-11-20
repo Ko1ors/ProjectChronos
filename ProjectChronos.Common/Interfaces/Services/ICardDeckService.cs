@@ -6,7 +6,7 @@ namespace ProjectChronos.Common.Interfaces.Services
 {
     public interface ICardDeckService
     {
-        UserDeck GetActiveUserDeck(IUser user);
+        UserDeck? GetActiveUserDeck(IUser user);
 
         IEnumerable<UserDeck> GetAllUserDecks(IUser user);
 

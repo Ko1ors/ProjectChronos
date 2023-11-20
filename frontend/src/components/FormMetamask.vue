@@ -46,6 +46,8 @@ const connectMetamask = async () => {
         console.error(err);
       }
     });
+    console.log(accounts.value);
+
 
     // Set the isMetamaskConnected flag to true
     isMetamaskConnected.value = true;
@@ -70,6 +72,7 @@ const signMessageAsync = async () => {
       params: [msg, accounts.value[0]],
     });
     await loginAsync(accounts.value[0], sign.value, true);
+    window.open("/ProfileInfo", "_self");
   }
   else {
     responseInfo = messageResponse.message;

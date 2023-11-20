@@ -30,8 +30,8 @@ namespace ProjectChronos.Controllers
         [Authorize]
         public async Task<IActionResult> GetActiveDeck()
         {
-            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            return Ok(_cardDeckService.GetActiveUserDeck(currentUser).ToDto());
+            var currentUser = (await _userManager.FindByNameAsync(User.Identity!.Name!))!;
+            return Ok(_cardDeckService.GetActiveUserDeck(currentUser)?.ToDto() ?? null);
         }
 
         // Get all card decks
