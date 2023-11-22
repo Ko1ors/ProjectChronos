@@ -2,18 +2,8 @@
 
 namespace ProjectChronos.Common.Entities
 {
-    internal class MatchAttackTurn : IMatchAttackTurn
+    public class MatchAttackTurn : MatchTurn, IMatchAttackTurn
     {
-        public int Id { get; set; }
-
-        public int Index { get; set; }
-
-        public int MatchInstanceId { get; set; }
-
-        public bool IsUserTurn { get; set; }
-
-        public IMatchInstance MatchInstance { get; set; }
-
         public int AttackCardId { get; set; }
 
         public int TargetCardId { get; set; }

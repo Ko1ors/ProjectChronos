@@ -17,7 +17,7 @@ namespace ProjectChronos.Common.Interfaces.Entities
 
         public DateTime CreatedAt { get; set; }
 
-        public UserDeck UserDeckSnapshot { get; set; }
+        public IUserDeck UserDeckSnapshot { get; set; }
 
         public ICollection<IMatchTurn> Turns { get; set; }
     }
