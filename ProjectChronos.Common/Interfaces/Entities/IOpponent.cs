@@ -18,5 +18,7 @@
         public IOpponentDeck OpponentDeck { get; set; }
 
         public ICollection<IUser> OpponentUsers { get; set; }
+
+        public ICollection<IMatchInstance> Matches { get; set; }
     }
 }

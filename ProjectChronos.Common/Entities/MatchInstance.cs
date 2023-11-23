@@ -20,5 +20,9 @@ namespace ProjectChronos.Common.Entities
         public IUserDeck UserDeckSnapshot { get; set; }
 
         public ICollection<IMatchTurn> Turns { get; set; }
+
+        public IUser User { get; set; }
+
+        public IOpponent Opponent { get; set; }
     }
 }

@@ -22,6 +22,8 @@ namespace ProjectChronos.DB
 
         public DbSet<OpponentDeck> OpponentDecks { get; set; }
 
+        public DbSet<MatchInstance> Matches { get; set; }
+
         public ApplicationDbContext()
         {
 
@@ -87,6 +89,16 @@ namespace ProjectChronos.DB
             modelBuilder.Entity<MatchInstance>()
                 .HasOne(mi => mi.UserDeckSnapshot as UserDeck)
                 .WithMany();
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasOne(mi => mi.User as User)
+                .WithMany(u => u.Matches as ICollection<MatchInstance>)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasOne(mi => mi.Opponent as Opponent)
+                .WithMany(o => o.Matches as ICollection<MatchInstance>)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MatchDrawTurn>()
                 .HasMany(mt => mt.Cards as ICollection<MatchDrawnCard>)
