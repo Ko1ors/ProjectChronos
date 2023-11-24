@@ -187,7 +187,8 @@ namespace ProjectChronos.Services
             {
                 foreach (var t in targetCards)
                 {
-                    var score = CalculateDamage(a, t);
+                    // Calculate score using formula: min(dmg * evadeChance, targetHealth)
+                    var score = (int)Math.Round(Math.Min(CalculateDamage(a, t) * CalculateEvadeChance(t), t.CurrentHealth));
                     if (score > bestScore)
                     {
                         bestScore = score;
