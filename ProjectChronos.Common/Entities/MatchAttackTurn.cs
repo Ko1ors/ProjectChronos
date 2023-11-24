@@ -8,6 +8,8 @@ namespace ProjectChronos.Common.Entities
 
         public int TargetCardId { get; set; }
 
+        public bool IsEvaded { get; set; }
+
         public IMatchDrawnCard AttackCard { get; set; }
 
         public IMatchDrawnCard TargetCard { get; set; }

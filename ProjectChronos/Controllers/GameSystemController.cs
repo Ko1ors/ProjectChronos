@@ -40,5 +40,19 @@ namespace ProjectChronos.Controllers
             }
             return Ok(opponents.ToDto());
         }
+
+        // Initiate match
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> InitiateMatch([FromBody] int opponentId)
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            var matchInstance = await _gameSystemService.InitiateMatchAsync(currentUser, opponentId);
+            if (matchInstance == null)
+            {
+                return BadRequest();
+            }
+            return Ok();
+        }
     }
 }

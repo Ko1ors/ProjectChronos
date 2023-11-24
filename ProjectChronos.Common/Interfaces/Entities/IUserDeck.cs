@@ -1,4 +1,5 @@
 ﻿using ProjectChronos.Common.Entities;
+using System.Drawing;
 
 namespace ProjectChronos.Common.Interfaces.Entities
 {
@@ -15,6 +16,8 @@ namespace ProjectChronos.Common.Interfaces.Entities
         public IUser? User { get; set; }
 
         public ICollection<IDeckCard> DeckCards { get; set; }
+
+        public int Size { get; }
 
         IUserDeck Clone();
     }

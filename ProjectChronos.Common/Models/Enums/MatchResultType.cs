@@ -2,8 +2,9 @@
 {
     public enum MatchResultType
     {
+        Pending = 0,
         Win = 1,
         Loss = 2,
-        Draw = 3
+        Draw = 3,
     }
 }

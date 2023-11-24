@@ -16,6 +16,8 @@ namespace ProjectChronos.Common.Entities
 
         public ICollection<IDeckCard> DeckCards { get; set; }
 
+        public int Size => DeckCards.Sum(c => c.Quantity);
+
         public IUserDeck Clone()
         {
             var deck = new UserDeck
