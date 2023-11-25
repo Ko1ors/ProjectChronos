@@ -290,7 +290,10 @@ namespace ProjectChronos.Services
                         (c, d) => new MatchCardExtended(c, d.FirstOrDefault()?.Metadata)
                     ).ToList();
 
-                if (userDrawnExtendedCards.Count() != HandSize || opponentDrawnExtendedCards.Count() != HandSize)
+                if (userDrawnExtendedCards.Count != HandSize || opponentDrawnExtendedCards.Count != HandSize)
+                    throw new Exception("Cards not found");
+
+                if (userDrawnExtendedCards.Any(c => c.Metadata is null) || opponentDrawnExtendedCards.Any(c => c.Metadata is null))
                     throw new Exception("Cards not found");
 
                 var isUserTurn = true;
@@ -335,23 +338,12 @@ namespace ProjectChronos.Services
 
                     var bestCards = FindBestCardPair(attackerCards, targetCards);
                     var isEvaded = TryEvade(bestCards.Item2);
-
-                    var attackTurn = new MatchAttackTurn
-                    {
-                        MatchInstance = match,
-                        Index = match.Turns.Count + 1,
-                        IsUserTurn = isUserTurn,
-                        AttackCardId = bestCards.Item1.Card.Id,
-                        TargetCardId = bestCards.Item2.Card.Id,
-                        IsEvaded = isEvaded
-                    };
-
-                    match.Turns.Add(attackTurn);
+                    int damage = 0;
 
                     // If attack was not evaded, calculate damage
                     if (!isEvaded)
                     {
-                        var damage = CalculateDamage(bestCards.Item1, bestCards.Item2);
+                        damage = CalculateDamage(bestCards.Item1, bestCards.Item2);
                         // Apply damage
                         bestCards.Item2.CurrentHealth -= damage;
                         // Check if all target cards are dead
@@ -361,10 +353,26 @@ namespace ProjectChronos.Services
                         }
                     }
 
+                    var attackTurn = new MatchAttackTurnExtended
+                    {
+                        MatchInstance = match,
+                        Index = match.Turns.Count + 1,
+                        IsUserTurn = isUserTurn,
+                        AttackCardId = bestCards.Item1.Card.Id,
+                        TargetCardId = bestCards.Item2.Card.Id,
+                        IsEvaded = isEvaded,
+                        AttackDamage = damage,
+                        TargetHealth = bestCards.Item2.CurrentHealth,
+                    };
+
+                    match.Turns.Add(attackTurn);
+
                     isUserTurn = !isUserTurn;
                 }
 
                 // TODO: Delete user opponents relationship 
+
+                // TODO: Create new opponent based on user
 
                 var lastTurn = match.Turns.Last();
                 match.Result = lastTurn.IsUserTurn ? MatchResultType.Win : MatchResultType.Loss;
