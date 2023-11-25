@@ -5,5 +5,7 @@ namespace ProjectChronos.Common.Interfaces.Services
     public interface IGameSystemService
     {
         public Task<IEnumerable<IOpponent>> GetOrCreateUserOpponentsAsync(IUser user);
+
+        public Task<IMatchInstance> InitiateMatchAsync(IUser user, int opponentId);
     }
 }

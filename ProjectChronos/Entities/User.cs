@@ -8,5 +8,7 @@ namespace ProjectChronos.Entities
         public ICollection<IUserDeck> UserDecks { get; set; }
 
         public ICollection<IOpponent> Opponents { get; set; }
+
+        public ICollection<IMatchInstance> Matches { get; set; }
     }
 }

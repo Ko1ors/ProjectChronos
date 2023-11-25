@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Entities;
 using ProjectChronos.Extensions;
+using ProjectChronos.Models.DTOs;
 using ProjectChronos.Models.Requests;
 
 namespace ProjectChronos.Controllers
@@ -39,6 +40,21 @@ namespace ProjectChronos.Controllers
                 return BadRequest();
             }
             return Ok(opponents.ToDto());
+        }
+
+        // Initiate match
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<MatchDto>> InitiateMatch([FromBody] int opponentId)
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            var matchInstance = await _gameSystemService.InitiateMatchAsync(currentUser, opponentId);
+            if (matchInstance == null)
+            {
+                return BadRequest();
+            }
+            var dto = matchInstance.ToDto();
+            return Ok(dto);
         }
     }
 }
