@@ -220,6 +220,10 @@ namespace ProjectChronos.Services
                     throw new Exception("User deck has not enough cards");
 
                 // TODO: Validate deck's cards ownership
+                var isDeckValid = await _cardDeckService.ValidateCardsOwnershipAsync(user, userDeck.DeckCards);
+
+                if (!isDeckValid)
+                    throw new Exception("User deck has invalid cards");
 
                 // Create user deck snapshot
 
