@@ -219,7 +219,7 @@ namespace ProjectChronos.Services
                 if (userDeck.Size < DeckSize)
                     throw new Exception("User deck has not enough cards");
 
-                // TODO: Validate deck's cards ownership
+                // Validate deck's cards ownership
                 var isDeckValid = await _cardDeckService.ValidateCardsOwnershipAsync(user, userDeck.DeckCards);
 
                 if (!isDeckValid)
