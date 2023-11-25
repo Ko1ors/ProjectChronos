@@ -187,8 +187,9 @@ namespace ProjectChronos.Services
             {
                 foreach (var t in targetCards)
                 {
-                    // Calculate score using formula: min(dmg * evadeChance, targetHealth)
-                    var score = (int)Math.Round(Math.Min(CalculateDamage(a, t) * CalculateEvadeChance(t), t.CurrentHealth));
+                    // Calculate score using formula: min(dmg - dmg * evadeChance / 100, targetHealth)
+                    var damage = CalculateDamage(a, t);
+                    var score = (int)Math.Round(Math.Min(damage - damage * CalculateEvadeChance(t) / 100d, t.CurrentHealth));
                     if (score > bestScore)
                     {
                         bestScore = score;
@@ -350,6 +351,7 @@ namespace ProjectChronos.Services
                         damage = CalculateDamage(bestCards.Item1, bestCards.Item2);
                         // Apply damage
                         bestCards.Item2.CurrentHealth -= damage;
+
                         // Check if all target cards are dead
                         if (!targetCards.Any(c => c.IsAlive))
                         {

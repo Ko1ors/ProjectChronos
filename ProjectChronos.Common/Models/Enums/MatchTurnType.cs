@@ -4,6 +4,6 @@
     {
         Unknown = 0,
         Draw = 1,
-        Attack = 1,
+        Attack = 2,
     }
 }
