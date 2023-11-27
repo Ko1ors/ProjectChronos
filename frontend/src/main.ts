@@ -7,6 +7,7 @@ import AuthorizationPage from './components/AuthorizationPage.vue'
 import MainPage from './components/MainPage.vue'
 import DecksVue from './components/DecksVue.vue'
 import PacksVue from './components/PacksVue.vue'
+import GameVue from './components/GameVue.vue'
 import AboutChronos from './components/AboutChronos.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -26,7 +27,8 @@ const router = createRouter({
     { path: '/ProfileInfo', component: ProfileInfo },
     { path: '/AboutChronos', component: AboutChronos },
     { path: '/DecksVue', component: DecksVue },
-    { path: '/PacksVue', component: PacksVue }
+    { path: '/PacksVue', component: PacksVue },
+    { path: '/GameVue', component: GameVue }
   ]
 })
 

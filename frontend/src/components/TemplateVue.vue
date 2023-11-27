@@ -29,6 +29,10 @@
                     <router-link class="nav-link" to="/PacksVue">Packs
                     </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/GameVue">Game
+                    </router-link>
+                </li>
             </ul>
         </div>
     </nav>

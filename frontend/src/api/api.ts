@@ -2,6 +2,7 @@ import type UserDeck from '@/models/UserDeck'
 import type DeckCard from '@/models/DeckCard'
 import type { NFT } from '@thirdweb-dev/sdk'
 import { PackType } from '../models/PackType'
+import type Opponent from '../models/Opponent.ts'
 
 export const apiUrl = import.meta.env.VITE_SERVICE_API_URL
 
@@ -9,6 +10,11 @@ export interface Response<T> {
   success: boolean
   message: string
   data: T | null
+}
+
+export const getOpponentsAsync = async function (): Promise<Response<Opponent[]>> {
+  const response = getAsync<Opponent[]>(`${apiUrl}/GameSystem/GetOpponents`)
+  return response
 }
 
 export const isAuthorizedAsync = async function (): Promise<Response<boolean>> {
