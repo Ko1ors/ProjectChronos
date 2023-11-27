@@ -20,7 +20,7 @@ namespace ProjectChronos.Services
             _expressApiService = expressApiService;
         }
 
-        private async Task<bool> ValidateCardsOwnershipAsync(IUser user, IEnumerable<IDeckCard> cards)
+        public async Task<bool> ValidateCardsOwnershipAsync(IUser user, IEnumerable<IDeckCard> cards)
         {
             try
             {

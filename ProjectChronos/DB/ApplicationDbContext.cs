@@ -1,8 +1,6 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectChronos.Common.Entities;
-using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Entities;
 using System.Reflection;
 
@@ -23,6 +21,8 @@ namespace ProjectChronos.DB
         public DbSet<Opponent> Opponents { get; set; }
 
         public DbSet<OpponentDeck> OpponentDecks { get; set; }
+
+        public DbSet<MatchInstance> Matches { get; set; }
 
         public ApplicationDbContext()
         {
@@ -66,21 +66,53 @@ namespace ProjectChronos.DB
                 .HasMany(o => o.OpponentUsers as ICollection<User>)
                 .WithMany(u => u.Opponents as ICollection<Opponent>)
                 .UsingEntity(
-            "UserOpponent",
-            l => l
-                .HasOne(typeof(User))
+                "UserOpponent",
+                    l => l
+                        .HasOne(typeof(User))
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasPrincipalKey(nameof(User.Id))
+                        .OnDelete(DeleteBehavior.Restrict),
+                    r => r
+                        .HasOne(typeof(Opponent))
+                        .WithMany()
+                        .HasForeignKey("OpponentId")
+                        .HasPrincipalKey(nameof(Opponent.Id))
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasKey("UserId", "OpponentId")
+                );
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasMany(mi => mi.Turns as ICollection<MatchTurn>)
+                .WithOne(u => u.MatchInstance as MatchInstance);
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasOne(mi => mi.UserDeckSnapshot as UserDeck)
+                .WithMany();
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasOne(mi => mi.User as User)
+                .WithMany(u => u.Matches as ICollection<MatchInstance>)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchInstance>()
+                .HasOne(mi => mi.Opponent as Opponent)
+                .WithMany(o => o.Matches as ICollection<MatchInstance>)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchDrawTurn>()
+                .HasMany(mt => mt.Cards as ICollection<MatchDrawnCard>)
+                .WithOne(tc => tc.MatchDrawTurn as MatchDrawTurn);
+
+            modelBuilder.Entity<MatchAttackTurn>()
+                .HasOne(mt => mt.AttackCard as MatchDrawnCard)
                 .WithMany()
-                .HasForeignKey("UserId")
-                .HasPrincipalKey(nameof(User.Id))
-                .OnDelete(DeleteBehavior.Restrict),
-            r => r
-                .HasOne(typeof(Opponent))
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchAttackTurn>()
+                .HasOne(mt => mt.TargetCard as MatchDrawnCard)
                 .WithMany()
-                .HasForeignKey("OpponentId")
-                .HasPrincipalKey(nameof(Opponent.Id))
-                .OnDelete(DeleteBehavior.Cascade),
-            j => j.HasKey("UserId", "OpponentId")
-        );
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         // For debug purposes

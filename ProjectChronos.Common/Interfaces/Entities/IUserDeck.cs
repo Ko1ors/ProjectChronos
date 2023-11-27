@@ -1,4 +1,7 @@
-﻿namespace ProjectChronos.Common.Interfaces.Entities
+﻿using ProjectChronos.Common.Entities;
+using System.Drawing;
+
+namespace ProjectChronos.Common.Interfaces.Entities
 {
     public interface IUserDeck
     {
@@ -9,8 +12,13 @@
         public bool Active { get; set; }
 
         // User can be null if the deck is an opponent deck
+        // or if the deck is a snapshot of a user deck
         public IUser? User { get; set; }
 
         public ICollection<IDeckCard> DeckCards { get; set; }
+
+        public int Size { get; }
+
+        IUserDeck Clone();
     }
 }

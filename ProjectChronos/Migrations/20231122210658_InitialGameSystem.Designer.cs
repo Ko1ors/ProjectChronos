@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectChronos.DB;
 
@@ -11,9 +12,11 @@ using ProjectChronos.DB;
 namespace ProjectChronos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231122210658_InitialGameSystem")]
+    partial class InitialGameSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,17 +333,13 @@ namespace ProjectChronos.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OpponentId");
-
                     b.HasIndex("UserDeckSnapshotId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Matches");
+                    b.ToTable("MatchInstance");
                 });
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.MatchTurn", b =>
@@ -529,9 +528,6 @@ namespace ProjectChronos.Migrations
                     b.Property<int>("AttackCardId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsEvaded")
-                        .HasColumnType("bit");
-
                     b.Property<int>("TargetCardId")
                         .HasColumnType("int");
 
@@ -659,27 +655,11 @@ namespace ProjectChronos.Migrations
 
             modelBuilder.Entity("ProjectChronos.Common.Entities.MatchInstance", b =>
                 {
-                    b.HasOne("ProjectChronos.Common.Entities.Opponent", "Opponent")
-                        .WithMany("Matches")
-                        .HasForeignKey("OpponentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ProjectChronos.Common.Entities.UserDeck", "UserDeckSnapshot")
                         .WithMany()
                         .HasForeignKey("UserDeckSnapshotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ProjectChronos.Entities.User", "User")
-                        .WithMany("Matches")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Opponent");
-
-                    b.Navigation("User");
 
                     b.Navigation("UserDeckSnapshot");
                 });
@@ -765,11 +745,6 @@ namespace ProjectChronos.Migrations
                     b.Navigation("Turns");
                 });
 
-            modelBuilder.Entity("ProjectChronos.Common.Entities.Opponent", b =>
-                {
-                    b.Navigation("Matches");
-                });
-
             modelBuilder.Entity("ProjectChronos.Common.Entities.UserDeck", b =>
                 {
                     b.Navigation("DeckCards");
@@ -777,8 +752,6 @@ namespace ProjectChronos.Migrations
 
             modelBuilder.Entity("ProjectChronos.Entities.User", b =>
                 {
-                    b.Navigation("Matches");
-
                     b.Navigation("UserDecks");
                 });
 
