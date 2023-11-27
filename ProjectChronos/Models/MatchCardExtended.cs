@@ -26,6 +26,12 @@ namespace ProjectChronos.Models
 
         public int Power => Metadata.Power;
 
+        public string Class => Metadata.Class;
+
+        public bool IsMelee => Class == "Melee";
+
+        public bool IsRanged => Class == "Ranged";
+
         public ElementType Element => Enum.TryParse(Metadata.Element, out ElementType element) ? element : default;
 
         public bool IsAlive => CurrentHealth > 0;
