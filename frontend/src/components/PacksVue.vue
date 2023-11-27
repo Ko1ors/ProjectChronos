@@ -85,6 +85,7 @@ const openPack = async (pack: NFT) => {
 
     packs.value = (await getOwnedPacksAsync()).data!
 
+    packCards.value = []
     allCards.value.forEach(element => {
         transaction.value!.erc1155Rewards!.forEach((trElement) => {
             if (trElement.tokenId == element.metadata.id) {
