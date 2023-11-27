@@ -28,22 +28,134 @@ namespace ProjectChronos.Services
             Description = "A pack of cards to get you started",
             ImageUrl = "",
             Type = CardPackType.WelcomePack,
-            RewardsPerPack = 3,
+            RewardsPerPack = 4,
             RewardTemplates = new List<ICardPackRewardTemplate>()
             {
+                // Legendary
                 new CardPackRewardTemplate()
                 {
                     ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
-                    TokenId = 0,
+                    TokenId = 7,
                     QuantityPerReward = 1,
-                    TotalRewards = 12
+                    TotalRewards = 1
                 },
                 new CardPackRewardTemplate()
                 {
                     ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
-                    TokenId = 1,
+                    TokenId = 13,
                     QuantityPerReward = 1,
-                    TotalRewards = 3
+                    TotalRewards = 1
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 18,
+                    QuantityPerReward = 1,
+                    TotalRewards = 1
+                },
+
+                // Epic
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 17,
+                    QuantityPerReward = 1,
+                    TotalRewards = 2
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 6,
+                    QuantityPerReward = 1,
+                    TotalRewards = 2
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 14,
+                    QuantityPerReward = 1,
+                    TotalRewards = 2
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 15,
+                    QuantityPerReward = 1,
+                    TotalRewards = 2
+                },
+
+                // Rare
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 19,
+                    QuantityPerReward = 1,
+                    TotalRewards = 4
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 20,
+                    QuantityPerReward = 1,
+                    TotalRewards = 4
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 8,
+                    QuantityPerReward = 1,
+                    TotalRewards = 4
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 12,
+                    QuantityPerReward = 1,
+                    TotalRewards = 4
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 5,
+                    QuantityPerReward = 1,
+                    TotalRewards = 4
+                },
+
+                // Common
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 2,
+                    QuantityPerReward = 1,
+                    TotalRewards = 13
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 3,
+                    QuantityPerReward = 1,
+                    TotalRewards = 13
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 9,
+                    QuantityPerReward = 1,
+                    TotalRewards = 13
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 11,
+                    QuantityPerReward = 1,
+                    TotalRewards = 13
+                },
+                new CardPackRewardTemplate()
+                {
+                    ContractAddress = "0x72d1137eaB36EE1C9BAfB12dE74Ed683e5407508",
+                    TokenId = 16,
+                    QuantityPerReward = 1,
+                    TotalRewards = 13
                 }
             }
         };
@@ -408,7 +520,7 @@ namespace ProjectChronos.Services
                 }
 
                 var pack = ownedPacksResponse.Data.FirstOrDefault(p => p.Metadata.InternalId == createdPack.InternalId);
-                if(pack is null)
+                if (pack is null)
                 {
                     throw new Exception("Failed to find pack");
                 }
