@@ -183,10 +183,19 @@ namespace ProjectChronos.Services
             MatchCardExtended bestTargetCard = null;
 
             var bestScore = 0;
+            var targetHasMeleeCards = targetCards.Any(c => c.IsMelee);
             foreach (var a in attackCards)
             {
                 foreach (var t in targetCards)
                 {
+
+                    // If target has melee cards, attack card is melee and target card is ranged, then skip
+                    // This is to prevent melee cards from attacking target ranged cards when there are target melee cards present
+                    if (targetHasMeleeCards && a.IsMelee && t.IsRanged)
+                    {
+                        continue;
+                    }
+
                     // Calculate score using formula: min(dmg - dmg * evadeChance / 100, targetHealth)
                     var damage = CalculateDamage(a, t);
                     var score = (int)Math.Round(Math.Min(damage - damage * CalculateEvadeChance(t) / 100d, t.CurrentHealth));
