@@ -45,10 +45,10 @@ namespace ProjectChronos.Controllers
         // Initiate match
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<MatchDto>> InitiateMatch([FromBody] int opponentId)
+        public async Task<ActionResult<MatchDto>> InitiateMatch([FromBody] InitiateMatchRequest model)
         {
             var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            var matchInstance = await _gameSystemService.InitiateMatchAsync(currentUser, opponentId);
+            var matchInstance = await _gameSystemService.InitiateMatchAsync(currentUser, model.OpponentId);
             if (matchInstance == null)
             {
                 return BadRequest();
