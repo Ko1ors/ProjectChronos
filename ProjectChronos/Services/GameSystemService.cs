@@ -2,6 +2,7 @@
 using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Entities;
 using ProjectChronos.Common.Interfaces.Services;
+using ProjectChronos.Common.Models;
 using ProjectChronos.Common.Models.Enums;
 using ProjectChronos.DB;
 using ProjectChronos.Models;
@@ -201,30 +202,31 @@ namespace ProjectChronos.Services
             return (bestAttackCard, bestTargetCard);
         }
 
-        public async Task<IMatchInstance> InitiateMatchAsync(IUser user, int opponentId)
+        public async Task<ServiceResult<IMatchInstance>> InitiateMatchAsync(IUser user, int opponentId)
         {
             using var transaction = _dbContext.Database.BeginTransaction();
+            var result = new ServiceResult<IMatchInstance>();
             try
             {
                 var opponent = GetUserOpponents(user).Where(o => o.Id == opponentId).FirstOrDefault();
 
                 if (opponent is null)
-                    throw new Exception("Opponent not found");
+                    throw new ServiceException("Opponent not found");
 
                 // Validate that user has active deck with enough cards
                 var userDeck = _cardDeckService.GetActiveUserDeck(user);
 
                 if (userDeck is null)
-                    throw new Exception("User deck not found");
+                    throw new ServiceException("User deck not found");
 
                 if (userDeck.Size < DeckSize)
-                    throw new Exception("User deck has not enough cards");
+                    throw new ServiceException("User deck has not enough cards");
 
                 // Validate deck's cards ownership
                 var isDeckValid = await _cardDeckService.ValidateCardsOwnershipAsync(user, userDeck.DeckCards);
 
                 if (!isDeckValid)
-                    throw new Exception("User deck has invalid cards");
+                    throw new ServiceException("User deck has invalid cards");
 
                 // Create user deck snapshot
 
@@ -250,7 +252,7 @@ namespace ProjectChronos.Services
                 var cards = await _expressApiService.GetAllNftsAsync();
 
                 if (!cards.Success || !cards.Data.Any())
-                    throw new Exception("Cards not found");
+                    throw new ServiceException("Cards not found");
 
                 // Create draw turns
                 var userDrawTurn = new MatchDrawTurn
@@ -296,10 +298,10 @@ namespace ProjectChronos.Services
                     ).ToList();
 
                 if (userDrawnExtendedCards.Count != HandSize || opponentDrawnExtendedCards.Count != HandSize)
-                    throw new Exception("Cards not found");
+                    throw new ServiceException("Cards not found");
 
                 if (userDrawnExtendedCards.Any(c => c.Metadata is null) || opponentDrawnExtendedCards.Any(c => c.Metadata is null))
-                    throw new Exception("Cards not found");
+                    throw new ServiceException("Cards not found");
 
                 var isUserTurn = true;
 
@@ -385,14 +387,21 @@ namespace ProjectChronos.Services
                 _dbContext.SaveChanges();
 
                 transaction.Commit();
-                return match;
+                result.Success = true;
+                result.Data = match;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 transaction.Rollback();
+
+                result.Success = false;
+                if (ex is ServiceException)
+                    result.Message = ex.Message;
+                else
+                    result.Message = "Unexpected error occured while initiating match. Please try again later.";
             }
-            return null;
+            return result;
         }
     }
 }
