@@ -2,7 +2,8 @@ import type UserDeck from '@/models/UserDeck'
 import type DeckCard from '@/models/DeckCard'
 import type { NFT } from '@thirdweb-dev/sdk'
 import { PackType } from '../models/PackType'
-import type Opponent from '../models/Opponent.ts'
+import type Opponent from '../models/Opponent'
+import type Match from '../models/Match'
 
 export const apiUrl = import.meta.env.VITE_SERVICE_API_URL
 
@@ -14,6 +15,11 @@ export interface Response<T> {
 
 export const getOpponentsAsync = async function (): Promise<Response<Opponent[]>> {
   const response = getAsync<Opponent[]>(`${apiUrl}/GameSystem/GetOpponents`)
+  return response
+}
+
+export const initiateMatchAsync = async function (opponentId: number): Promise<Response<Match>> {
+  const response = postAsync<Match>(`${apiUrl}/GameSystem/InitiateMatch`, opponentId)
   return response
 }
 
