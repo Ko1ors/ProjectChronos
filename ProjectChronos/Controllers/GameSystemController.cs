@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using ProjectChronos.Common.Entities;
 using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Entities;
 using ProjectChronos.Extensions;
@@ -48,13 +49,13 @@ namespace ProjectChronos.Controllers
         public async Task<ActionResult<MatchDto>> InitiateMatch([FromBody] InitiateMatchRequest model)
         {
             var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
-            var matchInstance = await _gameSystemService.InitiateMatchAsync(currentUser, model.OpponentId);
-            if (matchInstance == null)
+            var matchInstanceResult = await _gameSystemService.InitiateMatchAsync(currentUser, model.OpponentId);
+            if (matchInstanceResult.Success)
             {
-                return BadRequest();
+                var dto = matchInstanceResult.Data.ToDto();
+                return Ok(dto);
             }
-            var dto = matchInstance.ToDto();
-            return Ok(dto);
+            return BadRequest(matchInstanceResult.Message);
         }
     }
 }

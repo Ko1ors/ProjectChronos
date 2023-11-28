@@ -2,6 +2,6 @@
 {
     public class ServiceResult<T> : BaseServiceResult
     {
-        public T Result { get; set; }
+        public T Data { get; set; }
     }
 }

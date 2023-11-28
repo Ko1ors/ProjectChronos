@@ -1,4 +1,5 @@
 ﻿using ProjectChronos.Common.Interfaces.Entities;
+using ProjectChronos.Common.Models;
 
 namespace ProjectChronos.Common.Interfaces.Services
 {
@@ -6,6 +7,6 @@ namespace ProjectChronos.Common.Interfaces.Services
     {
         public Task<IEnumerable<IOpponent>> GetOrCreateUserOpponentsAsync(IUser user);
 
-        public Task<IMatchInstance> InitiateMatchAsync(IUser user, int opponentId);
+        public Task<ServiceResult<IMatchInstance>> InitiateMatchAsync(IUser user, int opponentId);
     }
 }
