@@ -111,7 +111,7 @@ onBeforeMount(async () => {
 
     packs.value = (await getOwnedPacksAsync()).data!
     allCards.value = await contractCards.erc1155.getAll();
-    console.log(allCards);
+    console.log(packs);
 
 })
 
