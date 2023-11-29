@@ -24,7 +24,7 @@ namespace ProjectChronos.Common.Entities
             {
                 Name = Name,
                 Active = Active,
-                User = User,
+                User = null,
             };
             deck.DeckCards = DeckCards.Select(x => x.Clone(deck)).ToList();
 
