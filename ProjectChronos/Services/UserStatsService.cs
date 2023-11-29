@@ -12,13 +12,14 @@ namespace ProjectChronos.Services
         private readonly ApplicationDbContext _dbContext;
         private readonly IExpressApiService _expressApiService;
         private readonly ICardDeckService _cardDeckService;
+        private readonly IGameSystemService _gameSystemService;
 
-        public UserStatsService(ApplicationDbContext dbContext, IExpressApiService expressApiService, ICardDeckService cardDeckService)
+        public UserStatsService(ApplicationDbContext dbContext, IExpressApiService expressApiService, ICardDeckService cardDeckService, IGameSystemService gameSystemService)
         {
             _dbContext = dbContext;
             _expressApiService = expressApiService;
             _cardDeckService = cardDeckService;
-
+            _gameSystemService = gameSystemService;
         }
 
         public async Task<CompositeUserStats> GetCompositeUserStatsAsync(IUser user)
@@ -98,6 +99,16 @@ namespace ProjectChronos.Services
                     }
                     stats.TotalOwnedCardsByClass = totalOwnedCardsByClass;
                 }
+
+                // Fill user match stats
+                var userMatches = _gameSystemService.GetAllUserMatches(user);
+
+                stats.Wins = userMatches.Count(m => m.Result == MatchResultType.Win);
+                stats.Losses = userMatches.Count(m => m.Result == MatchResultType.Loss);
+                stats.Draws = userMatches.Count(m => m.Result == MatchResultType.Draw);
+
+                stats.TotalMatches = userMatches.Count();
+
                 return stats;
             }
             catch (Exception e)

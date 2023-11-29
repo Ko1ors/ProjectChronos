@@ -412,5 +412,21 @@ namespace ProjectChronos.Services
             }
             return result;
         }
+
+        public IEnumerable<IMatchInstance> GetAllUserMatches(IUser user)
+        {
+            try
+            {
+                return  _dbContext.Matches
+                    .Where(m => m.User.Id == user.Id)
+                    .Include(m => m.Turns)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return Enumerable.Empty<IMatchInstance>();
+        }
     }
 }
