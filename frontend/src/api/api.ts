@@ -19,7 +19,7 @@ export const getOpponentsAsync = async function (): Promise<Response<Opponent[]>
 }
 
 export const initiateMatchAsync = async function (opponentId: number): Promise<Response<Match>> {
-  const response = postAsync<Match>(`${apiUrl}/GameSystem/InitiateMatch`, opponentId)
+  const response = postAsync<Match>(`${apiUrl}/GameSystem/InitiateMatch`, { opponentId })
   return response
 }
 
