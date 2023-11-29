@@ -24,6 +24,7 @@ builder.Services.AddScoped<IExpressApiService, ExpressApiService>();
 builder.Services.AddScoped<IPolygonService, PolygonService>();
 builder.Services.AddScoped<ICardPackService, CardPackService>();
 builder.Services.AddScoped<ICardDeckService, CardDeckService>();
+builder.Services.AddScoped<IGameSystemService, GameSystemService>();
 
 builder.Services.AddHostedService<PackCreationHostedService>();
 
@@ -59,7 +60,7 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

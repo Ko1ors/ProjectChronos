@@ -13,5 +13,15 @@ namespace ProjectChronos.Common.Entities
         public int Quantity { get; set; }
 
         public IUserDeck UserDeck { get; set; }
+
+        public IDeckCard Clone(UserDeck deck = null)
+        {
+            return new DeckCard
+                {
+                    CardId = CardId,
+                    Quantity = Quantity,
+                    UserDeck = deck
+                };
+        }
     }
 }
