@@ -25,6 +25,7 @@ builder.Services.AddScoped<IPolygonService, PolygonService>();
 builder.Services.AddScoped<ICardPackService, CardPackService>();
 builder.Services.AddScoped<ICardDeckService, CardDeckService>();
 builder.Services.AddScoped<IGameSystemService, GameSystemService>();
+builder.Services.AddScoped<IUserStatsService, UserStatsService>();
 
 builder.Services.AddHostedService<PackCreationHostedService>();
 

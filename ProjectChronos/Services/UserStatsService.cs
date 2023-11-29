@@ -36,26 +36,69 @@ namespace ProjectChronos.Services
                 if(ownedCardsResult.Success)
                 {
                     var ownedCards = ownedCardsResult.Data;
+
                     // Fill user card stats
                     stats.TotalOwnedCards = ownedCards.Sum(c => int.Parse(c.QuantityOwned));
                     stats.TotalUniqueOwnedCards = ownedCards.Count();
 
+
+                    // Get total owned cards by type
                     var totalOwnedCardsByElement = new UserStatTotalGroup()
                     {
                         GroupName = "Element",
                         Items = new List<UserStatTotalGroupItem>()
                     };
 
-                    foreach (string element in Enum.GetNames(typeof(ElementType)))
+                    var groupedByElement = ownedCards.GroupBy(c => c.Metadata.Element);
+                    foreach (var group in groupedByElement)
                     {
                         totalOwnedCardsByElement.Items.Add(new UserStatTotalGroupItem()
                         {
-                            Name = element,
-                            Total = ownedCards.Where(c => c.Metadata.Element == element).Sum(c => int.Parse(c.QuantityOwned))
+                            Name = group.Key,
+                            Value = group.Sum(c => int.Parse(c.QuantityOwned))
                         });
                     }
+                    stats.TotalOwnedCardsByElement = totalOwnedCardsByElement;
+
+
+                    // Get total owned cards by rarity
+                    var totalOwnedCardsByRarity = new UserStatTotalGroup()
+                    {
+                        GroupName = "Rarity",
+                        Items = new List<UserStatTotalGroupItem>()
+                    };
+
+                    var groupedByRarity = ownedCards.GroupBy(c => c.Metadata.Rarity);
+                    foreach (var group in groupedByRarity)
+                    {
+                        totalOwnedCardsByRarity.Items.Add(new UserStatTotalGroupItem()
+                        {
+                            Name = group.Key,
+                            Value = group.Sum(c => int.Parse(c.QuantityOwned))
+                        });
+                    }
+                    stats.TotalOwnedCardsByRarity = totalOwnedCardsByRarity;
+
+
+                    // Get total owned cards by class
+                    var totalOwnedCardsByClass = new UserStatTotalGroup()
+                    {
+                        GroupName = "Class",
+                        Items = new List<UserStatTotalGroupItem>()
+                    };
+
+                    var groupedByType = ownedCards.GroupBy(c => c.Metadata.Class);
+                    foreach (var group in groupedByType)
+                    {
+                        totalOwnedCardsByClass.Items.Add(new UserStatTotalGroupItem()
+                        {
+                            Name = group.Key,
+                            Value = group.Sum(c => int.Parse(c.QuantityOwned))
+                        });
+                    }
+                    stats.TotalOwnedCardsByClass = totalOwnedCardsByClass;
                 }
-      
+                return stats;
             }
             catch (Exception e)
             {

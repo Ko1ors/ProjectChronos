@@ -7,7 +7,6 @@
 
         public string UserAddress { get; set; }
 
-
         // Cards Stats
         public int TotalOwnedCards { get; set; }
 
@@ -17,7 +16,7 @@
 
         public UserStatTotalGroup TotalOwnedCardsByRarity { get; set; }
 
-        public UserStatTotalGroup TotalOwnedCardsByType { get; set; }
+        public UserStatTotalGroup TotalOwnedCardsByClass { get; set; }
 
         // Match Stats
         public int Wins { get; set; }
