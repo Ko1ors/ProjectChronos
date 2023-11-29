@@ -158,5 +158,13 @@ namespace ProjectChronos.Controllers
             await _signInManager.UserManager.AddToRoleAsync(user, "Administrator");
             return Ok("Administrator role was assigned successfully");
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            return Ok(currentUser);
+        }
     }
 }
