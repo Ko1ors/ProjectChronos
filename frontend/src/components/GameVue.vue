@@ -3,6 +3,7 @@
 import TemplateVue from './TemplateVue.vue'
 import { getOpponentsAsync, initiateMatchAsync } from '../api/api';
 import type Opponent from '../models/Opponent';
+import type MatchCard from '../models/MatchCard';
 import { ref, onBeforeMount } from 'vue'
 import Button from 'primevue/button'
 import { MetaMaskWallet } from "@thirdweb-dev/wallets";
@@ -20,10 +21,22 @@ let opponentDeckContentVisible = ref(false);
 let opponentNumber = ref(0)
 let playersContentNone = ref(true);
 let squaresContentNone = ref(false);
+let buttonContentNone = ref(false);
+let buttondisabled = ref(true);
 let meleeName = ref("")
 let rangedName = ref("")
 let dialogName = ref("")
 let match = ref<Match>();
+let yourMelee = ref<MatchCard[]>([]);
+let yourRanged = ref<MatchCard[]>([]);
+let opponentsMelee = ref<MatchCard[]>([]);
+let opponentsRanged = ref<MatchCard[]>([]);
+let opponentsCard = ref<MatchCard>();
+let yourCard = ref<MatchCard>();
+let turnInfo = ref("")
+let fightEffect = ref(true)
+let fightEffectName = ref("")
+let isEvasion = ref(false)
 
 const mapElement = new Map([
     ["Aether", "#E6E6FA"],
@@ -77,19 +90,135 @@ const opponentActiveDeck = (opponentId: number) => {
     opponentDeckContentVisible.value = true
 }
 
-const gameplay = async (opponentId: number) => {
+const gameView = async (opponentId: number) => {
+    console.log(match);
     playersContentNone.value = false
     squaresContentNone.value = true
     opponentNumber.value = opponentId
     meleeName.value = opponents.value[opponentId].name + '\'s melee cards'
     rangedName.value = opponents.value[opponentId].name + '\'s ranged cards'
     match.value = (await initiateMatchAsync(opponentId + 1)).data!
-    console.log(match);
 
+    yourMelee.value = []
+    yourRanged.value = []
+    opponentsMelee.value = []
+    opponentsRanged.value = []
 
+    match.value.turns[0].cards?.forEach((element) => {
+        allCards.value.forEach((card) => {
+            if (element.cardId == parseInt(card.metadata.id) && card.metadata.class == "Melee") {
+                yourMelee.value.push(card as MatchCard)
+                yourMelee.value[yourMelee.value.length - 1].matchId = element.id
+            }
+        })
+    })
+
+    match.value.turns[0].cards?.forEach((element) => {
+        allCards.value.forEach((card) => {
+            if (element.cardId == parseInt(card.metadata.id) && card.metadata.class == "Ranged") {
+                yourRanged.value.push(card as MatchCard)
+                yourRanged.value[yourRanged.value.length - 1].matchId = element.id
+            }
+        })
+    })
+
+    match.value.turns[1].cards?.forEach((element) => {
+        allCards.value.forEach((card) => {
+            if (element.cardId == parseInt(card.metadata.id) && card.metadata.class == "Melee") {
+                opponentsMelee.value.push(card as MatchCard)
+                opponentsMelee.value[opponentsMelee.value.length - 1].matchId = element.id
+            }
+        })
+    })
+
+    match.value.turns[1].cards?.forEach((element) => {
+        allCards.value.forEach((card) => {
+            if (element.cardId == parseInt(card.metadata.id) && card.metadata.class == "Ranged") {
+                opponentsRanged.value.push(card as MatchCard)
+                opponentsRanged.value[opponentsRanged.value.length - 1].matchId = element.id
+            }
+        })
+    })
+
+    buttondisabled.value = false
 }
 
 const startTheGame = () => {
+    buttonContentNone.value = true
+    fightEffect.value = true
+
+    if (yourMelee.value.find((element) => element.matchId == match.value!.turns[2].attackCardId)) {
+        let index = yourMelee.value.findIndex((element) => element.matchId == match.value!.turns[2].attackCardId)
+        yourCard.value = yourMelee.value.find((element) => element.matchId == match.value!.turns[2].attackCardId)
+        yourMelee.value.splice(index, 1)
+    }
+    else {
+        let index = yourRanged.value.findIndex((element) => element.matchId == match.value!.turns[2].attackCardId)
+        yourCard.value = yourRanged.value.find((element) => element.matchId == match.value!.turns[2].attackCardId)
+        yourRanged.value.splice(index, 1)
+    }
+
+    if (opponentsMelee.value.find((element) => element.matchId == match.value!.turns[2].targetCardId)) {
+        let index = opponentsMelee.value.findIndex((element) => element.matchId == match.value!.turns[2].targetCardId)
+        opponentsCard.value = opponentsMelee.value.find((element) => element.matchId == match.value!.turns[2].targetCardId)
+        opponentsMelee.value.splice(index, 1)
+    }
+    else {
+        let index = opponentsRanged.value.findIndex((element) => element.matchId == match.value!.turns[2].targetCardId)
+        opponentsCard.value = opponentsRanged.value.find((element) => element.matchId == match.value!.turns[2].targetCardId)
+        opponentsRanged.value.splice(index, 1)
+    }
+
+    if (match.value!.turns[2].isUserTurn) {
+        turnInfo.value = "User's turn: " + yourCard.value?.metadata.name + " attaks " + opponentsCard.value?.metadata.name
+    }
+    else {
+        turnInfo.value = "Opponent's turn: " + opponentsCard.value?.metadata.name + " attaks " + yourCard.value?.metadata.name
+    }
+
+    setTimeout(() => {
+        if (match.value!.turns[2].isUserTurn) {
+
+            if (!match.value!.turns[2].isEvaded) {
+                if (match.value!.turns[2].targetHealth! > 0) {
+                    opponentsCard.value!.metadata.health = match.value!.turns[2].targetHealth
+
+                }
+                else {
+                    opponentsCard.value!.metadata.health = match.value!.turns[2].targetHealth = 0
+                }
+                isEvasion.value = false
+                fightEffectName.value = "-" + match.value!.turns[2].attackDamage
+                fightEffect.value = false
+
+            }
+            else {
+                fightEffectName.value = "Evasion"
+                isEvasion.value = true
+                fightEffect.value = false
+
+            }
+        }
+        else {
+            if (!match.value!.turns[2].isEvaded) {
+                if (match.value!.turns[2].targetHealth! > 0) {
+                    yourCard.value!.metadata.health = match.value!.turns[2].targetHealth
+
+                }
+                else {
+                    yourCard.value!.metadata.health = match.value!.turns[2].targetHealth = 0
+                }
+                isEvasion.value = false
+                fightEffectName.value = "-" + match.value!.turns[2].attackDamage
+                fightEffect.value = false
+            }
+            else {
+                fightEffectName.value = "Evasion"
+                isEvasion.value = true
+                fightEffect.value = false
+            }
+        }
+    }, 3000);
 
 }
 
@@ -107,9 +236,7 @@ onBeforeMount(async () => {
     const sdk = await ThirdwebSDK.fromWallet(wallet, "mumbai", {
         clientId: "b4b85c7265a5e23dae86b0085ca57083", // Use client id if using on the client side, get it from dashboard settings
     });
-    const address = await wallet.getAddress();
 
-    //const contract = await sdk.getContract(import.meta.env.VITE_PACKS_CONTRACT, "pack");
     try {
         const contractCards = await sdk.getContract(import.meta.env.VITE_CARDS_CONTRACT);
         allCards.value = await contractCards.erc1155.getAll();
@@ -119,7 +246,6 @@ onBeforeMount(async () => {
     }
 
     opponents.value = (await getOpponentsAsync()).data!
-
 
 })
 
@@ -178,21 +304,28 @@ onBeforeMount(async () => {
         </Dialog>
         <div class="wrapper">
             <div class="content">
+                <Button label="Choose first opponent" class="choose-button" @click="fightEffect = !fightEffect"></Button>
+                <Transition>
+                    <p v-if="fightEffect" class="test-effect"> Borrow </p>
+                </Transition>
                 <div class="squares-block" v-bind:class="{ 'none': squaresContentNone }">
                     <div class="opponent-block">
                         <div class="opponent">
-                            <div class="opponent-header">{{ opponents[0].name }}</div>
-                            <Button label="Choose first opponent" class="choose-button" @click="gameplay(0)"></Button>
+                            <div v-if="opponents[0] !== undefined" class="opponent-header">{{ opponents[0].name }}
+                            </div>
+                            <Button label="Choose first opponent" class="choose-button" @click="gameView(0)"></Button>
                             <Button label="Check active deck" class="choose-button" @click="opponentActiveDeck(0)"></Button>
                         </div>
                         <div class="opponent">
-                            <div class="opponent-header">{{ opponents[1].name }}</div>
-                            <Button label="Choose second opponent" class="choose-button" @click="gameplay(1)"></Button>
+                            <div v-if="opponents[1] !== undefined" class="opponent-header">{{ opponents[1].name }}
+                            </div>
+                            <Button label="Choose second opponent" class="choose-button" @click="gameView(1)"></Button>
                             <Button label="Check active deck" class="choose-button" @click="opponentActiveDeck(1)"></Button>
                         </div>
                         <div class="opponent">
-                            <div class="opponent-header">{{ opponents[2].name }}</div>
-                            <Button label="Choose third opponent" class="choose-button" @click="gameplay(2)"></Button>
+                            <div v-if="opponents[2] !== undefined" class="opponent-header">{{ opponents[2].name }}
+                            </div>
+                            <Button label="Choose third opponent" class="choose-button" @click="gameView(2)"></Button>
                             <Button label="Check active deck" class="choose-button" @click="opponentActiveDeck(2)"></Button>
                         </div>
                     </div>
@@ -200,24 +333,295 @@ onBeforeMount(async () => {
                 <div class="player-content" v-bind:class="{ 'none': playersContentNone }">
                     <div class="player-block">
                         <div class="player-header">{{ rangedName }}</div>
-                        <div class="player"></div>
+                        <div class="player">
+                            <div class="game-card-wrapper">
+                                <div class="card-content">
+                                    <div class="cards-block">
+                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                            <div class="card-col" v-for="card in opponentsRanged" :key="card.metadata.id">
+                                                <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
+                                                    :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
+                                                    <div>
+                                                        <div class="name">{{ card.metadata.name }}</div>
+                                                    </div>
+                                                    <div class="image-block">
+                                                        <img class="card-img" :src="(card.metadata.image as string)"
+                                                            alt="Card image">
+                                                        <div class="rarity-block">
+                                                            <div class="dot"
+                                                                :style="{ backgroundColor: mapRarity.get(card.metadata.rarity as string) }">
+                                                            </div>
+                                                        </div>
+                                                        <div class="attack-block">
+                                                            <div class="square">{{ card.metadata.power }}</div>
+                                                        </div>
+                                                        <div class="health-block">
+                                                            <div class="health-dot">{{ card.metadata.health }}</div>
+                                                        </div>
+                                                        <div class="agility-block">
+                                                            <div class="diamond"><span class="agility"> {{
+                                                                card.metadata.agility
+                                                            }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="card-element">{{
+                                                            mapSymbolOfElement.get(card.metadata.element as
+                                                                string)
+                                                        }}</div>
+                                                        <img class="class-img"
+                                                            :src="getCardClass(card.metadata.class as string)"
+                                                            alt="Card class">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="player-block">
                         <div class="player-header">{{ meleeName }}</div>
-                        <div class="player"></div>
+                        <div class="player">
+                            <div class="game-card-wrapper">
+                                <div class="card-content">
+                                    <div class="cards-block">
+                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                            <div class="card-col" v-for="card in opponentsMelee" :key="card.metadata.id">
+                                                <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
+                                                    :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
+                                                    <div>
+                                                        <div class="name">{{ card.metadata.name }}</div>
+                                                    </div>
+                                                    <div class="image-block">
+                                                        <img class="card-img" :src="(card.metadata.image as string)"
+                                                            alt="Card image">
+                                                        <div class="rarity-block">
+                                                            <div class="dot"
+                                                                :style="{ backgroundColor: mapRarity.get(card.metadata.rarity as string) }">
+                                                            </div>
+                                                        </div>
+                                                        <div class="attack-block">
+                                                            <div class="square">{{ card.metadata.power }}</div>
+                                                        </div>
+                                                        <div class="health-block">
+                                                            <div class="health-dot">{{ card.metadata.health }}</div>
+                                                        </div>
+                                                        <div class="agility-block">
+                                                            <div class="diamond"><span class="agility"> {{
+                                                                card.metadata.agility
+                                                            }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="card-element">{{
+                                                            mapSymbolOfElement.get(card.metadata.element as
+                                                                string)
+                                                        }}</div>
+                                                        <img class="class-img"
+                                                            :src="getCardClass(card.metadata.class as string)"
+                                                            alt="Card class">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="board-content">
+                        <div class="turn-info">{{ turnInfo }}</div>
                         <div class="board">
-                            <Button label="Start the game" class="choose-button" @click="startTheGame()"></Button>
+                            <Transition>
+                                <p :class="{ 'evasion': isEvasion }" v-if="fightEffect" class="fight-effect"> {{
+                                    fightEffectName }} </p>
+                            </Transition>
+                            <div class="start-button">
+                                <Button label="Start the game" class="choose-button" @click="startTheGame()"
+                                    :disabled="buttondisabled" v-bind:class="{ 'none': buttonContentNone }"></Button>
+                            </div>
+                            <div class="opponent-card">
+                                <div class="card" v-if="opponentsCard !== undefined"
+                                    :class="getCardRarity(opponentsCard!.metadata.rarity as string)"
+                                    :style="{ backgroundColor: mapElement.get(opponentsCard!.metadata.element as string) }">
+                                    <div>
+                                        <div class="name">{{ opponentsCard!.metadata.name }}</div>
+                                    </div>
+                                    <div class="image-block">
+                                        <img class="card-img" :src="(opponentsCard!.metadata.image as string)"
+                                            alt="Card image">
+                                        <div class="rarity-block">
+                                            <div class="dot"
+                                                :style="{ backgroundColor: mapRarity.get(opponentsCard!.metadata.rarity as string) }">
+                                            </div>
+                                        </div>
+                                        <div class="attack-block">
+                                            <div class="square">{{ opponentsCard!.metadata.power }}</div>
+                                        </div>
+                                        <div class="health-block">
+                                            <div class="health-dot">{{ opponentsCard!.metadata.health }}</div>
+                                        </div>
+                                        <div class="agility-block">
+                                            <div class="diamond"><span class="agility"> {{
+                                                opponentsCard!.metadata.agility
+                                            }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="card-element">{{
+                                            mapSymbolOfElement.get(opponentsCard!.metadata.element as
+                                                string)
+                                        }}</div>
+                                        <img class="class-img" :src="getCardClass(opponentsCard!.metadata.class as string)"
+                                            alt="Card class">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="your-card">
+                                <div class="card" v-if="yourCard !== undefined"
+                                    :class="getCardRarity(yourCard!.metadata.rarity as string)"
+                                    :style="{ backgroundColor: mapElement.get(yourCard!.metadata.element as string) }">
+                                    <div>
+                                        <div class="name">{{ yourCard!.metadata.name }}</div>
+                                    </div>
+                                    <div class="image-block">
+                                        <img class="card-img" :src="(yourCard!.metadata.image as string)" alt="Card image">
+                                        <div class="rarity-block">
+                                            <div class="dot"
+                                                :style="{ backgroundColor: mapRarity.get(yourCard!.metadata.rarity as string) }">
+                                            </div>
+                                        </div>
+                                        <div class="attack-block">
+                                            <div class="square">{{ yourCard!.metadata.power }}</div>
+                                        </div>
+                                        <div class="health-block">
+                                            <div class="health-dot">{{ yourCard!.metadata.health }}</div>
+                                        </div>
+                                        <div class="agility-block">
+                                            <div class="diamond"><span class="agility"> {{
+                                                yourCard!.metadata.agility
+                                            }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="card-element">{{
+                                            mapSymbolOfElement.get(yourCard!.metadata.element as
+                                                string)
+                                        }}</div>
+                                        <img class="class-img" :src="getCardClass(yourCard!.metadata.class as string)"
+                                            alt="Card class">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="player-block">
                         <div class="player-header">Your melee cards</div>
-                        <div class="player"></div>
+                        <div class="player">
+                            <div class="game-card-wrapper">
+                                <div class="card-content">
+                                    <div class="cards-block">
+                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                            <div class="card-col" v-for="card in yourMelee" :key="card.metadata.id">
+                                                <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
+                                                    :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
+                                                    <div>
+                                                        <div class="name">{{ card.metadata.name }}</div>
+                                                    </div>
+                                                    <div class="image-block">
+                                                        <img class="card-img" :src="(card.metadata.image as string)"
+                                                            alt="Card image">
+                                                        <div class="rarity-block">
+                                                            <div class="dot"
+                                                                :style="{ backgroundColor: mapRarity.get(card.metadata.rarity as string) }">
+                                                            </div>
+                                                        </div>
+                                                        <div class="attack-block">
+                                                            <div class="square">{{ card.metadata.power }}</div>
+                                                        </div>
+                                                        <div class="health-block">
+                                                            <div class="health-dot">{{ card.metadata.health }}</div>
+                                                        </div>
+                                                        <div class="agility-block">
+                                                            <div class="diamond"><span class="agility"> {{
+                                                                card.metadata.agility
+                                                            }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="card-element">{{
+                                                            mapSymbolOfElement.get(card.metadata.element as
+                                                                string)
+                                                        }}</div>
+                                                        <img class="class-img"
+                                                            :src="getCardClass(card.metadata.class as string)"
+                                                            alt="Card class">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="player-block">
                         <div class="player-header">Your ranged cards</div>
-                        <div class="player"></div>
+                        <div class="player">
+                            <div class="game-card-wrapper">
+                                <div class="card-content">
+                                    <div class="cards-block">
+                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                            <div class="card-col" v-for="card in yourRanged" :key="card.metadata.id">
+                                                <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
+                                                    :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
+                                                    <div>
+                                                        <div class="name">{{ card.metadata.name }}</div>
+                                                    </div>
+                                                    <div class="image-block">
+                                                        <img class="card-img" :src="(card.metadata.image as string)"
+                                                            alt="Card image">
+                                                        <div class="rarity-block">
+                                                            <div class="dot"
+                                                                :style="{ backgroundColor: mapRarity.get(card.metadata.rarity as string) }">
+                                                            </div>
+                                                        </div>
+                                                        <div class="attack-block">
+                                                            <div class="square">{{ card.metadata.power }}</div>
+                                                        </div>
+                                                        <div class="health-block">
+                                                            <div class="health-dot">{{ card.metadata.health }}</div>
+                                                        </div>
+                                                        <div class="agility-block">
+                                                            <div class="diamond"><span class="agility"> {{
+                                                                card.metadata.agility
+                                                            }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="card-element">{{
+                                                            mapSymbolOfElement.get(card.metadata.element as
+                                                                string)
+                                                        }}</div>
+                                                        <img class="class-img"
+                                                            :src="getCardClass(card.metadata.class as string)"
+                                                            alt="Card class">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -230,25 +634,63 @@ onBeforeMount(async () => {
     display: none;
 }
 
+.test-effect {
+    color: red;
+    padding: 200px 0px 0px 0px;
+    font-weight: bold;
+    font-size: 50px;
+}
+
+.v-leave-active {
+    transition: all 2.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+    transform: translateY(-250px);
+}
+
 .wrapper {
     padding: 20px;
 }
 
 .board-content {
-    height: 700px;
+    height: 600px;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.your-card {
+    flex: 0 0 30%;
+}
+
+.opponent-card {
+    flex: 0 0 30%;
 }
 
 .board {
-    height: 600px;
+    height: 500px;
     width: 800px;
     background-color: green;
     border: 2px solid #000;
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 100px;
+    z-index: 1;
+}
+
+.start-button {
+    position: absolute;
+    z-index: -1;
+}
+
+.turn-info {
+    font-weight: bold;
 }
 
 .player-content {
@@ -257,6 +699,10 @@ onBeforeMount(async () => {
 
 .player-block {
     margin: 0px 0px 30px 0px;
+}
+
+.player-block:nth-child(2) {
+    margin: 0px 0px 0px 0px;
 }
 
 .choose-button {
@@ -296,7 +742,7 @@ div.opponent {
 
 .player {
     border: 1px solid #000;
-    height: 300px;
+    height: 320px;
     width: 100%;
     overflow: auto;
 }
@@ -322,9 +768,13 @@ div.opponent {
     padding: 20px;
 }
 
+.game-card-wrapper {
+    padding: 5px;
+}
+
 .card-content {
     display: flex;
-    margin: 0px -10px 50px -10px;
+    margin: 0px -10px 0px -10px;
 }
 
 .cards-block {
@@ -507,8 +957,25 @@ div.opponent {
     position: relative;
 }
 
+.fight-effect {
+    color: red;
+    position: absolute;
+    top: 38%;
+    left: 42%;
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.evasion {
+    color: green;
+}
+
 .row {
     padding: 15px;
+}
+
+.special-row {
+    width: 1100px;
 }
 
 .card-col {
