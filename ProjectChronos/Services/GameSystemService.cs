@@ -41,6 +41,12 @@ namespace ProjectChronos.Services
 
         private static Dictionary<ElementType, ElementType> ElementWeaknesses => ElementStrengths.ToDictionary(x => x.Value, x => x.Key);
 
+        // These cards will not be included in the opponents card pool
+        private static readonly List<int> ExcludedCardIds = new()
+        {
+            0, 1, 4, 10
+        };
+
 
 
         public GameSystemService(ApplicationDbContext dbContext, IExpressApiService expressApiService, ICardDeckService cardDeckService)
@@ -77,6 +83,8 @@ namespace ProjectChronos.Services
             var cards = await _expressApiService.GetAllNftsAsync();
             if (!cards.Success || !cards.Data.Any())
                 return Enumerable.Empty<IOpponent>();
+
+            cards.Data = cards.Data.Where(c => !ExcludedCardIds.Contains(int.Parse(c.Metadata.Id))).ToList();
 
             for (var i = 0; i < OpponentsCount; i++)
             {
