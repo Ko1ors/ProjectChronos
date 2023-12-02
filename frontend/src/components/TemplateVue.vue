@@ -1,3 +1,17 @@
+<script setup lang="ts">
+import AboutPage from './AboutPage.vue'
+import { isAuthorizedAsync } from '../api/api';
+import { ref, onBeforeMount } from 'vue'
+
+let isAuthorized = ref(true)
+
+onBeforeMount(async () => {
+
+    isAuthorized.value = (await isAuthorizedAsync()).data!
+    console.log(isAuthorized);
+
+})
+</script>
 
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -12,7 +26,7 @@
                 <li class="nav-item">
                     <router-link class="nav-link" to="/AuthorizationPage">Metamask authorization</router-link>
                 </li>
-                <li class="nav-item">
+                <li :disabled="!isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/ProfileInfo">Profile
                         <img class="profile" src="../resources/Profile.png" alt="Profile">
                     </router-link>
@@ -21,15 +35,15 @@
                     <router-link class="nav-link" to="/AboutChronos">About Chronos
                     </router-link>
                 </li>
-                <li class="nav-item">
+                <li :disabled="!isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/DecksVue">Decks
                     </router-link>
                 </li>
-                <li class="nav-item">
+                <li :disabled="!isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/PacksVue">Packs
                     </router-link>
                 </li>
-                <li class="nav-item">
+                <li :disabled="!isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/GameVue">Game
                     </router-link>
                 </li>
@@ -43,10 +57,6 @@
     </div>
     <div class="footer">&copy;<span id="year"> 2023</span><span> Chronos. All rights reserved.</span></div>
 </template>
-
-<script setup lang="ts">
-import AboutPage from './AboutPage.vue'
-</script>
 
 <style scoped lang="scss">
 .navbar-brand {

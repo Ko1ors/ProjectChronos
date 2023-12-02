@@ -4,7 +4,6 @@ import Dialog from 'primevue/dialog';
 import TemplateVue from './TemplateVue.vue'
 import Button from 'primevue/button'
 import { ref, onBeforeMount } from 'vue'
-import type Transaction from '../models/Transaction.ts';
 import type Card from '../models/Card.ts';
 import type DeckCard from '../models/DeckCard.ts';
 import type UserDeck from '../models/UserDeck.ts';
@@ -359,7 +358,7 @@ onBeforeMount(async () => {
             </div>
             <div class="block-button">
                 <Button :label="buttonLable" class="deck-button" @click="updateDeckVisible = true"
-                    :disabled="getList(2).reduce((accumulator, currentValue) => accumulator + parseInt(currentValue.quantityOwned!), 0) < 5"></Button>
+                    :disabled="getList(2).reduce((accumulator, currentValue) => accumulator + parseInt(currentValue.quantityOwned!), 0) < 12"></Button>
                 <Button :disabled="!isDeck" label="Delete active deck" class="deck-button"
                     @click="deleteDeckVisible = true"></Button>
             </div>
