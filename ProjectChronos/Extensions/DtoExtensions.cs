@@ -45,7 +45,7 @@ namespace ProjectChronos.Extensions
             {
                 Id = opponent.Id,
                 Name = opponent.Name,
-                OpponentDeck = opponent.OpponentDeck.ToDto()
+                OpponentDeck = opponent.OpponentDeck?.ToDto()
             };
         }
 
@@ -134,9 +134,14 @@ namespace ProjectChronos.Extensions
                 Result = matchInstance.Result,
                 SystemVersion = matchInstance.SystemVersion,
                 CreatedAt = matchInstance.CreatedAt,
-                UserDeck = matchInstance.UserDeckSnapshot.ToDto(),
-                Turns = matchInstance.Turns.ToDto()
+                UserDeck = matchInstance.UserDeckSnapshot?.ToDto(),
+                Turns = matchInstance.Turns?.ToDto()
             };
+        }
+
+        public static IEnumerable<MatchDto> ToDto(this IEnumerable<IMatchInstance> matchInstances)
+        {
+            return matchInstances.Select(ToDto);
         }
     }
 }
