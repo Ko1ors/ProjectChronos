@@ -57,5 +57,25 @@ namespace ProjectChronos.Controllers
             }
             return BadRequest(matchInstanceResult.Message);
         }
+
+        // Get all user matches
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<ICollection<MatchDto>>> GetUserMatches()
+        {
+            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name);
+            var matches = _gameSystemService.GetAllUserMatches(currentUser);
+            return Ok(matches.ToDto());
+        }
+
+        // Get all user matches by user address
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult<ICollection<MatchDto>>> GetUserMatchesByUserAddress(string address)
+        {
+            var user = await _userManager.FindByNameAsync(address);
+            var matches = _gameSystemService.GetAllUserMatches(user);
+            return Ok(matches.ToDto());
+        }
     }
 }

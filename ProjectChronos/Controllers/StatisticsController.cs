@@ -25,5 +25,14 @@ namespace ProjectChronos.Controllers
             var stats = await _userStatsService.GetCompositeUserStatsAsync(currentUser);
             return Ok(stats);
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetUserStatisticsByAddress(string address)
+        {
+            var user = await _userManager.FindByNameAsync(address);
+            var stats = await _userStatsService.GetCompositeUserStatsAsync(user);
+            return Ok(stats);
+        }
     }
 }

@@ -9,6 +9,6 @@ namespace ProjectChronos.Common.Interfaces.Services
 
         public Task<ServiceResult<IMatchInstance>> InitiateMatchAsync(IUser user, int opponentId);
 
-        public IEnumerable<IMatchInstance> GetAllUserMatches(IUser user);
+        public IEnumerable<IMatchInstance> GetAllUserMatches(IUser user, bool includeDetails = false);
     }
 }

@@ -421,13 +421,22 @@ namespace ProjectChronos.Services
             return result;
         }
 
-        public IEnumerable<IMatchInstance> GetAllUserMatches(IUser user)
+        public IEnumerable<IMatchInstance> GetAllUserMatches(IUser user, bool includeDetails = false)
         {
             try
             {
-                return  _dbContext.Matches
+                IQueryable<MatchInstance> query = _dbContext.Matches;
+                if (includeDetails)
+                {
+                    query = query
+                        .Include(m => m.UserDeckSnapshot)
+                        .ThenInclude(d => d.DeckCards)
+                        .Include(m => m.Turns)
+                        .ThenInclude(t => (t as MatchDrawTurn).Cards);
+                }
+
+                return query
                     .Where(m => m.User.Id == user.Id)
-                    .Include(m => m.Turns)
                     .ToList();
             }
             catch (Exception ex)
