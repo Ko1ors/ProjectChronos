@@ -244,12 +244,12 @@ const opponentActiveDeck = (opponentId: number) => {
 }
 
 const gameView = async (opponentId: number) => {
-    console.log(match);
     playersContentNone.value = false
     squaresContentNone.value = true
     opponentNumber.value = opponentId
     opponentsName.value = opponents.value[opponentId].name + '\'s cards'
     match.value = (await initiateMatchAsync(opponentId + 4)).data!
+    console.log(match);
 
     yourMelee.value = []
     yourRanged.value = []
@@ -460,7 +460,7 @@ onBeforeMount(async () => {
                                 <div class="card-content">
                                     <img class="img-block" :src=range alt="card class">
                                     <div class="cards-block">
-                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                        <div class="row row-cols-xl-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
                                             <div class="card-col" v-for="card in opponentsRanged" :key="card.metadata.id">
                                                 <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
                                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
@@ -511,7 +511,7 @@ onBeforeMount(async () => {
                                 <div class="card-content">
                                     <img class="img-block" :src=melee alt="card class">
                                     <div class="cards-block">
-                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                        <div class="row row-cols-xl-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
                                             <div class="card-col" v-for="card in opponentsMelee" :key="card.metadata.id">
                                                 <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
                                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
@@ -651,7 +651,7 @@ onBeforeMount(async () => {
                                 <div class="card-content">
                                     <img class="img-block" :src=melee alt="card class">
                                     <div class="cards-block">
-                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                        <div class="row row-cols-xl-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
                                             <div class="card-col" v-for="card in yourMelee" :key="card.metadata.id">
                                                 <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
                                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
@@ -702,7 +702,7 @@ onBeforeMount(async () => {
                                 <div class="card-content">
                                     <img class="img-block" :src=range alt="card class">
                                     <div class="cards-block">
-                                        <div class="row row-cols-lg-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
+                                        <div class="row row-cols-xl-5 row-cols-md-2 row-cols-1 overflow-auto special-row">
                                             <div class="card-col" v-for="card in yourRanged" :key="card.metadata.id">
                                                 <div class="card" :class="getCardRarity(card.metadata.rarity as string)"
                                                     :style="{ backgroundColor: mapElement.get(card.metadata.element as string) }">
@@ -791,7 +791,7 @@ onBeforeMount(async () => {
 
 .board {
     height: 500px;
-    width: 800px;
+    width: 400px;
     background-color: green;
     border: 2px solid #000;
     display: flex;
@@ -799,6 +799,10 @@ onBeforeMount(async () => {
     align-items: center;
     gap: 100px;
     z-index: 1;
+
+    @include media-breakpoint-up(lg) {
+        width: 800px;
+    }
 }
 
 .start-button {
@@ -835,6 +839,7 @@ div.opponent-block {
     justify-content: center;
     gap: 50px;
     height: 100%;
+    flex-wrap: wrap;
 }
 
 div.opponent {
@@ -856,7 +861,7 @@ div.opponent {
 
 .player {
     border: 1px solid #000;
-    height: 320px;
+    height: 330px;
     width: 100%;
     overflow: auto;
 }
@@ -869,7 +874,11 @@ div.opponent {
 
 .squares-block {
     width: 100%;
-    height: 700px;
+    height: fit-content;
+
+    @include media-breakpoint-up(md) {
+        height: 700px;
+    }
 }
 
 .name {
@@ -882,6 +891,7 @@ div.opponent {
     align-self: center;
     height: 100px;
     margin: 0px 0px 0px 20px;
+
 }
 
 .card-wrapper {
@@ -890,11 +900,12 @@ div.opponent {
 
 .game-card-wrapper {
     padding: 5px;
+    height: 100%;
 }
 
 .card-content {
     display: flex;
-    margin: 0px -10px 0px -10px;
+    height: 100%;
 }
 
 .cards-block {
@@ -1091,7 +1102,16 @@ div.opponent {
 }
 
 .special-row {
-    width: 1100px;
+    width: 250px;
+
+    @include media-breakpoint-up(md) {
+        width: 450px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        width: 1100px;
+    }
+
 }
 
 .card-col {

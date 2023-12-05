@@ -1,7 +1,18 @@
 <script setup lang="ts">
 
 import TemplateVue from './TemplateVue.vue'
+import { isAuthorizedAsync } from '../api/api';
+import { ref, onBeforeMount } from 'vue'
 
+let isAuthorized = ref(true)
+
+onBeforeMount(async () => {
+
+    isAuthorized.value = (await isAuthorizedAsync()).data!
+    if (!isAuthorized.value) {
+        window.location.href = "/AuthorizationPage"
+    }
+})
 </script>
 
 <template>

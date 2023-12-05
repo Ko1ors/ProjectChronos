@@ -8,7 +8,6 @@ let isAuthorized = ref(true)
 onBeforeMount(async () => {
 
     isAuthorized.value = (await isAuthorizedAsync()).data!
-    console.log(isAuthorized);
 
 })
 </script>
@@ -26,7 +25,7 @@ onBeforeMount(async () => {
                 <li class="nav-item">
                     <router-link class="nav-link" to="/AuthorizationPage">Metamask authorization</router-link>
                 </li>
-                <li :disabled="!isAuthorized" class="nav-item">
+                <li v-if="isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/ProfileInfo">Profile
                         <img class="profile" src="../resources/Profile.png" alt="Profile">
                     </router-link>
@@ -35,15 +34,15 @@ onBeforeMount(async () => {
                     <router-link class="nav-link" to="/AboutChronos">About Chronos
                     </router-link>
                 </li>
-                <li :disabled="!isAuthorized" class="nav-item">
+                <li v-if="isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/DecksVue">Decks
                     </router-link>
                 </li>
-                <li :disabled="!isAuthorized" class="nav-item">
+                <li v-if="isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/PacksVue">Packs
                     </router-link>
                 </li>
-                <li :disabled="!isAuthorized" class="nav-item">
+                <li v-if="isAuthorized" class="nav-item">
                     <router-link class="nav-link" to="/GameVue">Game
                     </router-link>
                 </li>

@@ -4,6 +4,7 @@ import type { NFT } from '@thirdweb-dev/sdk'
 import { PackType } from '../models/PackType'
 import type Opponent from '../models/Opponent'
 import type Match from '../models/Match'
+import type UserInfo from '../models/UserInfo'
 
 export const apiUrl = import.meta.env.VITE_SERVICE_API_URL
 
@@ -11,6 +12,11 @@ export interface Response<T> {
   success: boolean
   message: string
   data: T | null
+}
+
+export const getUserStatisticsAsync = async function (): Promise<Response<UserInfo>> {
+  const response = getAsync<UserInfo>(`${apiUrl}/Statistics/GetUserStatistics`)
+  return response
 }
 
 export const getOpponentsAsync = async function (): Promise<Response<Opponent[]>> {
