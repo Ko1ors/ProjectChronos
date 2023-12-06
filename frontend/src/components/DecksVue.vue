@@ -15,8 +15,6 @@ import melee from "../resources/melee.png"
 import { createDeckAsync, deleteDeckAsync, getActiveDeckAsync, updateDeckAsync } from '../api/api';
 import { isTouchDevice } from '../shared/MobileHelper';
 
-//let packs = ref<NFT[]>([]);
-//let tx: Transaction;
 let cards = ref<Card[]>([]);
 let activeDeck = ref<UserDeck>();
 let deleteDeckVisible = ref(false);
@@ -268,7 +266,7 @@ onBeforeMount(async () => {
                 <div class="cards-block">
                     <div class="info-header">Your cards</div>
                     <div class="cards-content" @drop="onDrop($event, 1)" @dragenter.prevent @dragover.prevent>
-                        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto">
+                        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto special-row">
                             <div class="col" v-for="card in getList(1)" :key="card.metadata.id">
                                 <div class="card" draggable="true" @dragstart="startDrag($event, card)"
                                     @click="onCardTouch(card, 2)" :class="getCardRarity(card.metadata.rarity as string)"
@@ -311,7 +309,7 @@ onBeforeMount(async () => {
                 <div class="cards-block">
                     <div class="info-header">Your decks</div>
                     <div class="cards-content" @drop="onDrop($event, 2)" @dragenter.prevent @dragover.prevent>
-                        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto">
+                        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 overflow-auto special-row">
                             <div class="col" v-for="card in getList(2)" :key="card.metadata.id">
                                 <div class="card" draggable="true" @dragstart="startDrag($event, card)"
                                     @click="onCardTouch(card, 1)" :class="getCardRarity(card.metadata.rarity as string)"
@@ -392,6 +390,10 @@ onBeforeMount(async () => {
     border: 2px dashed #aaa;
     height: 650px;
     overflow: auto;
+}
+
+.special-row {
+    width: 101.4%;
 }
 
 .clear-block {

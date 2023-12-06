@@ -1,4 +1,3 @@
-import './assets/main.css'
 import './assets/cdn.jsdelivr.net_npm_bootstrap@5.3.2_dist_css_bootstrap.min.css'
 import PrimeVue from 'primevue/config'
 import 'primevue/resources/themes/lara-light-purple/theme.css'

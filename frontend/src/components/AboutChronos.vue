@@ -105,6 +105,10 @@ const categories = [
                 title: 'Element',
                 description: 'The Element Attribute represents the inherent elemental nature or affinity of a creature or card. It denotes the fundamental energy or essence that the creature or card possesses, which can have various effects and interactions within the game.',
             },
+            {
+                title: 'Class',
+                description: 'A card class is a unique archetype in the vast world of card games. Each class is defined by its own aesthetics and character that describe the card and its mission in the game.',
+            },
         ],
     },
     // Add more categories here (Card Classes, Card Attributes, etc.)
@@ -117,8 +121,8 @@ const categories = [
     <TemplateVue>
         <div v-for="category in categories" :key="category.title">
             <h1 class="text-center">{{ category.title }}</h1>
-            <div class="row m-2 row-cols-lg-4 row-cols-md-2 row-cols-1 overflow-auto">
-                <div class="col-sm-3" v-for="feature in category.features" :key="feature.title">
+            <div class="row m-2 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1">
+                <div class="col" v-for="feature in category.features" :key="feature.title">
                     <div class="card mb-3">
                         <div class="card-header">{{ feature.title }}</div>
                         <div class="card-body">
@@ -139,11 +143,15 @@ const categories = [
 .card {
     display: block;
     position: relative;
-    height: 250px;
+    height: 310px;
     color: var(--primary-color-text);
     background-color: var(--primary-color);
     overflow: hidden;
     z-index: 0;
+
+    @media (min-width: 1500px) {
+        height: 250px;
+    }
 
     &:before {
         content: "";

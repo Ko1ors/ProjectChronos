@@ -4,8 +4,9 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import MetaMaskOnboarding from '@metamask/onboarding'
 import { ref } from 'vue';
 import { Buffer } from 'buffer';
-import { getAuthMessagesAsync, loginAsync } from '../api/api';
+import { getAuthMessagesAsync, loginAsync, logoutAsync } from '../api/api';
 import type { Response } from '../api/api';
+import Dialog from 'primevue/dialog';
 
 const isMetamaskConnected = ref(false);
 const connecting = ref(false);
@@ -15,11 +16,18 @@ const accounts = ref<string[]>([]);
 const sign = ref<string>("");
 let messageResponse: Response<string>;
 let responseInfo: string;
+let logoutVisible = ref(false)
 
 const mumbaiId = 80001;
 
-const handleChainChanged = () => {
+const pageReload = () => {
   window.location.reload();
+};
+
+const logout = async () => {
+  logoutVisible.value = false
+  await logoutAsync()
+  pageReload()
 };
 
 const connectMetamask = async () => {
@@ -35,7 +43,7 @@ const connectMetamask = async () => {
     networkVersion.value = await (provider as any).request({ method: 'net_version' });
 
     // Reload the page on network change
-    provider.on('chainChanged', handleChainChanged);
+    provider.on('chainChanged', pageReload);
 
     accounts.value = await (provider as any).request({ method: 'eth_requestAccounts' }).catch((err: any) => {
       if (err.code === 4001) {
@@ -83,39 +91,47 @@ const signMessageAsync = async () => {
 </script>
 
 <template>
-  <div class="col-lg-4 meta-form">
+  <Dialog :visible="logoutVisible" modal header="Message" :style="{ width: '50rem' }"
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <p class="m-0">
+      Do you want to log out?
+    </p>
+    <template #footer>
+      <Button label="Yes" icon="pi pi-check" @click="logout()" autofocus />
+      <Button label="No" icon="pi pi-check" @click="logoutVisible = false" text />
+    </template>
+  </Dialog>
+  <div class="meta-form">
     <h4 class="wallet-text">Connect with your wallet to access your profile</h4>
     <Button @click="connectMetamask" class="button-metamask">
       <img class="fox" src="/src/resources/MetaMask_Fox.svg.png" alt="Metamask" />
       <span>Login via metamask</span>
     </Button>
-    <p v-if="isMetamaskConnected && networkVersion != mumbaiId">Please switch to Polygon Mumbai Testnet</p>
-    <p v-if="responseInfo">Error in response: {{ responseInfo }}</p>
+    <Button @click="logoutVisible = true" class="button-metamask" alt="Metamask">
+      <span>Log out</span>
+    </Button>
+    <p class="error" v-if="isMetamaskConnected && networkVersion != mumbaiId">Please switch to Polygon Mumbai Testnet</p>
+    <p class="error" v-if="responseInfo">Error in response: {{ responseInfo }}</p>
   </div>
 </template>
 
 <style scoped lang="scss">
 .meta-form {
   border: 2px solid;
-  height: 300px;
+  height: 350px;
+  width: 400px;
   display: flex;
-  margin-top: 50px;
   border-radius: 5px;
   background-color: var(--surface-section);
   flex-direction: column;
   padding: 20px;
   align-items: center;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin: auto;
+  transform: translate(0, 30%);
 
   @include media-breakpoint-up(md) {
-    margin-left: 50px;
-    margin-right: 50px;
-  }
-
-  @include media-breakpoint-up(lg) {
-    margin-left: auto;
-    margin-right: auto;
+    width: 600px;
+    height: 300px;
   }
 }
 
@@ -123,10 +139,19 @@ const signMessageAsync = async () => {
   border-radius: 6px;
 }
 
+.error {
+  margin: 20px 0px 0px 0px;
+}
+
 .button-metamask {
-  width: 50%;
-  height: 20%;
-  margin-top: 80px;
+  width: 200px;
+  height: 60px;
+  margin: 30px 0px 0px 0px;
+
+  @include media-breakpoint-up(md) {
+    width: 250px;
+    height: 50px;
+  }
 }
 
 .button-metamask span {
