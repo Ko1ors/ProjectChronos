@@ -81,8 +81,6 @@ const openPack = async (pack: NFT) => {
         location.reload()
     }
 
-
-
     packs.value = (await getOwnedPacksAsync()).data!
 
     packCards.value = []

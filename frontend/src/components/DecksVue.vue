@@ -15,8 +15,6 @@ import melee from "../resources/melee.png"
 import { createDeckAsync, deleteDeckAsync, getActiveDeckAsync, updateDeckAsync } from '../api/api';
 import { isTouchDevice } from '../shared/MobileHelper';
 
-//let packs = ref<NFT[]>([]);
-//let tx: Transaction;
 let cards = ref<Card[]>([]);
 let activeDeck = ref<UserDeck>();
 let deleteDeckVisible = ref(false);

@@ -27,11 +27,6 @@ onBeforeMount(async () => {
             </div>
             <div class="info">
                 <p class="text">
-                    User's id: {{ userStatistics?.userId }}
-                </p>
-            </div>
-            <div class="info">
-                <p class="text">
                     Total user's matches: {{ userStatistics?.totalMatches }}
                 </p>
             </div>
