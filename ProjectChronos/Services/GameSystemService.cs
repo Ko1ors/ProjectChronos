@@ -5,6 +5,7 @@ using ProjectChronos.Common.Interfaces.Services;
 using ProjectChronos.Common.Models;
 using ProjectChronos.Common.Models.Enums;
 using ProjectChronos.DB;
+using ProjectChronos.Entities;
 using ProjectChronos.Models;
 using System.Collections.ObjectModel;
 
@@ -66,6 +67,21 @@ namespace ProjectChronos.Services
                 .ThenInclude(d => d.DeckCards)
                 .Where(o => o.OpponentUsers.Any(u => u.Id == user.Id))
                 .AsEnumerable();
+        }
+
+        private bool ResetUserOpponents(IUser user)
+        {
+            try
+            {
+                _dbContext.Users.Include(u => u.Opponents).First(u => u.Id == user.Id).Opponents.Clear();
+                _dbContext.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return false;
         }
 
         public async Task<IEnumerable<IOpponent>> GetOrCreateUserOpponentsAsync(IUser user)
@@ -394,11 +410,6 @@ namespace ProjectChronos.Services
 
                     isUserTurn = !isUserTurn;
                 }
-
-                // TODO: Delete user opponents relationship 
-
-                // TODO: Create new opponent based on user
-
                 var lastTurn = match.Turns.Last();
                 match.Result = lastTurn.IsUserTurn ? MatchResultType.Win : MatchResultType.Loss;
                 _dbContext.SaveChanges();
@@ -406,6 +417,14 @@ namespace ProjectChronos.Services
                 transaction.Commit();
                 result.Success = true;
                 result.Data = match;
+
+
+                // Delete user opponents relationship 
+                ResetUserOpponents(user);
+
+
+                // TODO: Create new opponent based on user
+
             }
             catch (Exception ex)
             {
